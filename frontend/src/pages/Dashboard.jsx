@@ -1,91 +1,56 @@
-import { useState, useEffect } from 'react'
+/**
+ * Enhanced Dashboard - Day 4 Database Connected
+ * Author: Enthusiast-AD
+ * Date: 2025-07-03 14:48:46 UTC
+ */
+
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { useMood } from '../contexts/MoodContext'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const Dashboard = () => {
+  const { user, isAuthenticated } = useAuth()
+  const { 
+    moodHistory, 
+    analytics, 
+    insights, 
+    crisisIncidents,
+    isLoading, 
+    websocket,
+    realtimeAnalysis,
+    refreshData,
+    getMoodTrend,
+    getAverageMood
+  } = useMood()
 
-function Dashboard() {
-  const [moodHistory, setMoodHistory] = useState([])
-  const [analytics, setAnalytics] = useState(null)
-  const [insights, setInsights] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [wsConnected, setWsConnected] = useState(false)
-  const [realtimeData, setRealtimeData] = useState(null)
-  const [userId] = useState('user_' + Date.now())
+  const [selectedPeriod, setSelectedPeriod] = useState(30)
 
-  useEffect(() => {
-    fetchMoodHistory()
-    connectWebSocket()
-    
-    return () => {
-      // Cleanup WebSocket on unmount
-      if (window.moodWebSocket) {
-        window.moodWebSocket.close()
-      }
-    }
-  }, [])
-
-  const fetchMoodHistory = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/mood/history/${userId}?days=30`)
-      if (response.ok) {
-        const data = await response.json()
-        setMoodHistory(data.history || [])
-        setAnalytics(data.analytics)
-        setInsights(data.enhanced_insights || [])
-      }
-    } catch (error) {
-      console.error('Failed to fetch mood history:', error)
-      // Load from localStorage as fallback
-      const offlineData = JSON.parse(localStorage.getItem('moodHistory') || '[]')
-      setMoodHistory(offlineData)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const connectWebSocket = () => {
-    try {
-      const wsUrl = `ws://localhost:8000/ws/mood-monitor/${userId}`
-      const ws = new WebSocket(wsUrl)
-      
-      ws.onopen = () => {
-        console.log('🔌 WebSocket connected')
-        setWsConnected(true)
-      }
-      
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        console.log('📡 Real-time data:', data)
-        setRealtimeData(data)
-        
-        // Update history if new mood tracked
-        if (data.type === 'mood_tracked_enhanced') {
-          setMoodHistory(prev => [...prev, data.data])
-        }
-      }
-      
-      ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected')
-        setWsConnected(false)
-        // Attempt to reconnect after 5 seconds
-        setTimeout(connectWebSocket, 5000)
-      }
-      
-      ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error)
-        setWsConnected(false)
-      }
-      
-      window.moodWebSocket = ws
-    } catch (error) {
-      console.error('Failed to connect WebSocket:', error)
-    }
+  // Redirect if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-6xl mx-auto text-center py-12">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
+          <p className="text-gray-600 mb-6">
+            Please sign in to view your personalized dashboard.
+          </p>
+          <Link 
+            to="/auth/login"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const getRecentMood = () => {
     if (moodHistory.length === 0) return { score: 5, emoji: '😐', color: 'text-gray-600' }
     
-    const recent = moodHistory[moodHistory.length - 1]
+    const recent = moodHistory[0]
     const score = recent.score
     
     let emoji, color
@@ -95,24 +60,7 @@ function Dashboard() {
     else if (score >= 2) { emoji = '😔'; color = 'text-orange-500' }
     else { emoji = '😢'; color = 'text-red-500' }
     
-    return { score, emoji, color, timestamp: recent.timestamp }
-  }
-
-  const calculateTrend = () => {
-    if (moodHistory.length < 2) return { trend: 'stable', percentage: 0 }
-    
-    const recent = moodHistory.slice(-7).map(entry => entry.score)
-    const older = moodHistory.slice(-14, -7).map(entry => entry.score)
-    
-    if (older.length === 0) return { trend: 'stable', percentage: 0 }
-    
-    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length
-    const olderAvg = older.reduce((a, b) => a + b, 0) / older.length
-    const change = ((recentAvg - olderAvg) / olderAvg) * 100
-    
-    if (change > 10) return { trend: 'improving', percentage: Math.round(change) }
-    if (change < -10) return { trend: 'declining', percentage: Math.round(Math.abs(change)) }
-    return { trend: 'stable', percentage: Math.round(Math.abs(change)) }
+    return { score, emoji, color, timestamp: recent.created_at }
   }
 
   const getTrendEmoji = (trend) => {
@@ -145,7 +93,8 @@ function Dashboard() {
   }
 
   const recentMood = getRecentMood()
-  const trend = calculateTrend()
+  const trend = getMoodTrend()
+  const averageMood = getAverageMood()
 
   if (isLoading) {
     return (
@@ -160,26 +109,39 @@ function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header */}
+      {/* Welcome Header */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2">Your Mental Health Dashboard</h1>
+        <h1 className="text-4xl font-bold mb-2">
+          Welcome back, {user?.full_name || user?.username}! 👋
+        </h1>
         <p className="text-gray-600">
-          AI-powered insights and real-time monitoring 
-          {wsConnected && <span className="text-green-600 ml-2">🔴 Live</span>}
+          Your AI-powered mental health dashboard with real-time insights
+          {websocket && <span className="text-green-600 ml-2">🟢 Live</span>}
         </p>
       </div>
 
-      {/* Real-time Alert */}
-      {realtimeData && realtimeData.crisis_alert && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-          🚨 Crisis support may be needed. Please consider reaching out for help.
-          <Link to="/crisis-support" className="ml-4 underline font-semibold">
-            View Crisis Resources
-          </Link>
+      {/* Real-time Analysis Alert */}
+      {realtimeAnalysis && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h3 className="font-semibold text-blue-800 mb-2">🤖 Real-time Analysis Active</h3>
+          <div className="grid md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Current Sentiment:</span> 
+              <span className="capitalize ml-1">{realtimeAnalysis.sentiment}</span>
+            </div>
+            <div>
+              <span className="font-medium">Energy Level:</span> 
+              <span className="capitalize ml-1">{realtimeAnalysis.energy_estimate}</span>
+            </div>
+            <div>
+              <span className="font-medium">Last Updated:</span> 
+              <span className="ml-1">{formatDate(realtimeAnalysis.timestamp)}</span>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Main Stats Grid */}
+      {/* Quick Stats Grid */}
       <div className="grid lg:grid-cols-4 gap-6">
         {/* Recent Mood */}
         <div className="bg-white rounded-lg shadow-lg p-6">
@@ -199,39 +161,26 @@ function Dashboard() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Weekly Trend</h2>
           <div className="text-center">
-            <div className="text-4xl mb-3">{getTrendEmoji(trend.trend)}</div>
-            <div className={`text-lg font-semibold ${getTrendColor(trend.trend)}`}>
-              {trend.trend.charAt(0).toUpperCase() + trend.trend.slice(1)}
+            <div className="text-4xl mb-3">{getTrendEmoji(trend)}</div>
+            <div className={`text-lg font-semibold ${getTrendColor(trend)}`}>
+              {trend.charAt(0).toUpperCase() + trend.slice(1).replace('_', ' ')}
             </div>
             <div className="text-gray-500 text-sm mt-2">
-              {trend.percentage > 0 ? `${trend.percentage}% change` : 'Stable'}
+              Based on recent entries
             </div>
           </div>
         </div>
 
-        {/* Analytics Summary */}
+        {/* Average Mood */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Analytics</h2>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Total Entries:</span>
-              <span className="font-semibold">{analytics?.total_entries || 0}</span>
+          <h2 className="text-xl font-semibold mb-4">Average Mood</h2>
+          <div className="text-center">
+            <div className="text-4xl mb-3">📊</div>
+            <div className="text-3xl font-bold text-blue-600">
+              {averageMood}/10
             </div>
-            <div className="flex justify-between">
-              <span>Average Mood:</span>
-              <span className="font-semibold">{analytics?.average_score || 'N/A'}/10</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Consistency:</span>
-              <span className="font-semibold capitalize">
-                {analytics?.consistency?.replace('_', ' ') || 'N/A'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Crisis Incidents:</span>
-              <span className={`font-semibold ${analytics?.crisis_incidents > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {analytics?.crisis_incidents || 0}
-              </span>
+            <div className="text-gray-500 text-sm mt-2">
+              {selectedPeriod} day average
             </div>
           </div>
         </div>
@@ -253,7 +202,7 @@ function Dashboard() {
               🆘 Crisis Support
             </Link>
             <button 
-              onClick={fetchMoodHistory}
+              onClick={refreshData}
               className="w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg font-semibold transition-colors"
             >
               🔄 Refresh Data
@@ -262,7 +211,65 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Insights */}
+      {/* Analytics Summary */}
+      {analytics && (
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">📊 Analytics Summary</h2>
+            <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(parseInt(e.target.value))}
+              className="px-3 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value={7}>Last 7 days</option>
+              <option value={30}>Last 30 days</option>
+              <option value={90}>Last 90 days</option>
+            </select>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{analytics.total_entries}</div>
+              <div className="text-gray-600">Total Entries</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{analytics.average_score}</div>
+              <div className="text-gray-600">Average Score</div>
+            </div>
+            <div className="text-center">
+              <div className={`text-2xl font-bold ${analytics.crisis_incidents > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                {analytics.crisis_incidents}
+              </div>
+              <div className="text-gray-600">Crisis Incidents</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {analytics.most_common_emotions?.length || 0}
+              </div>
+              <div className="text-gray-600">Emotions Tracked</div>
+            </div>
+          </div>
+
+          {/* Most Common Emotions */}
+          {analytics.most_common_emotions && analytics.most_common_emotions.length > 0 && (
+            <div className="mt-6">
+              <h3 className="font-semibold mb-3">Most Common Emotions</h3>
+              <div className="flex flex-wrap gap-2">
+                {analytics.most_common_emotions.slice(0, 5).map((emotion, index) => (
+                  <span 
+                    key={index}
+                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                  >
+                    {emotion.emotion} ({emotion.count})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* AI Insights */}
       {insights.length > 0 && (
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-semibold mb-4">🔮 AI Insights</h2>
@@ -276,14 +283,48 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Mood History Chart */}
+      {/* Crisis Incidents Summary */}
+      {crisisIncidents.length > 0 && (
+        <div className="bg-red-50 rounded-lg border border-red-200 p-6">
+          <h2 className="text-xl font-semibold mb-4 text-red-800">🚨 Recent Crisis Incidents</h2>
+          <div className="space-y-3">
+            {crisisIncidents.slice(0, 3).map((incident, index) => (
+              <div key={index} className="bg-white p-4 rounded border">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="font-medium">Risk Level: {incident.risk_level}</div>
+                    <div className="text-sm text-gray-600">
+                      {formatDate(incident.created_at)}
+                    </div>
+                  </div>
+                  <div className={`px-2 py-1 rounded text-xs ${
+                    incident.resolved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {incident.resolved ? 'Resolved' : 'Active'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <Link 
+              to="/crisis-support"
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-semibold transition-colors"
+            >
+              View Crisis Resources
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Mood History Visualization */}
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Mood History</h2>
         {moodHistory.length > 0 ? (
           <div className="space-y-4">
             {/* Simple visualization */}
             <div className="h-64 flex items-end justify-between bg-gray-50 p-4 rounded-lg">
-              {moodHistory.slice(-14).map((entry, index) => (
+              {moodHistory.slice(0, 14).reverse().map((entry, index) => (
                 <div key={index} className="flex flex-col items-center">
                   <div 
                     className="bg-blue-500 rounded-t"
@@ -294,7 +335,7 @@ function Dashboard() {
                     }}
                   ></div>
                   <div className="text-xs mt-2 text-gray-600">
-                    {formatDate(entry.timestamp).split(' ')[0]}
+                    {formatDate(entry.created_at).split(' ')[0]}
                   </div>
                 </div>
               ))}
@@ -303,7 +344,7 @@ function Dashboard() {
             {/* Recent entries list */}
             <div className="space-y-2">
               <h3 className="font-semibold">Recent Entries:</h3>
-              {moodHistory.slice(-5).reverse().map((entry, index) => (
+              {moodHistory.slice(0, 5).map((entry, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                   <div className="flex items-center space-x-3">
                     <span className="text-2xl">
@@ -317,7 +358,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    {formatDate(entry.timestamp)}
+                    {formatDate(entry.created_at)}
                   </div>
                 </div>
               ))}
@@ -337,13 +378,13 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Real-time Connection Status */}
+      {/* Connection Status */}
       <div className="bg-gray-100 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${wsConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <div className={`w-3 h-3 rounded-full ${websocket ? 'bg-green-500' : 'bg-red-500'}`}></div>
             <span className="text-sm font-medium">
-              Real-time Monitoring: {wsConnected ? 'Connected' : 'Disconnected'}
+              Real-time Monitoring: {websocket ? 'Connected' : 'Disconnected'}
             </span>
           </div>
           <div className="text-sm text-gray-600">
