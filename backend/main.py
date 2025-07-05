@@ -404,6 +404,210 @@ async def complete_ai_health_check():
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
+@app.get("/api/mood/history")
+async def get_user_mood_history(
+    limit: int = 50,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's mood history with AI analysis"""
+    try:
+        # Get user's mood entries ordered by most recent first
+        mood_entries = db.query(MoodEntry).filter(
+            MoodEntry.user_id == current_user.id
+        ).order_by(MoodEntry.created_at.desc()).limit(limit).all()
+        
+        # Convert to dict format for frontend
+        entries = []
+        for entry in mood_entries:
+            entry_dict = {
+                "id": entry.id,
+                "score": entry.score,
+                "emotions": entry.emotions or [],
+                "notes": entry.notes,
+                "activity": entry.activity,
+                "location": entry.location,
+                "weather": entry.weather,
+                "created_at": entry.created_at.isoformat(),
+                "updated_at": entry.updated_at.isoformat(),
+                "ai_analysis": {
+                    "sentiment": entry.sentiment,
+                    "energy_level": entry.energy_level,
+                    "risk_level": entry.risk_level,
+                    "analysis_confidence": getattr(entry, 'analysis_confidence', 0.7),
+                    "emotional_complexity": len(entry.emotions) if entry.emotions else 0
+                }
+            }
+            entries.append(entry_dict)
+        
+        logger.info(f"📊 Mood history requested for {current_user.username}: {len(entries)} entries")
+        
+        return {
+            "user_id": current_user.id,
+            "total_entries": len(entries),
+            "entries": entries,
+            "fetched_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error fetching mood history: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch mood history")
+
+@app.get("/api/mood/latest")
+async def get_latest_mood_entry(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's most recent mood entry"""
+    try:
+        latest_entry = db.query(MoodEntry).filter(
+            MoodEntry.user_id == current_user.id
+        ).order_by(MoodEntry.created_at.desc()).first()
+        
+        if not latest_entry:
+            return {"message": "No mood entries found"}
+        
+        return {
+            "id": latest_entry.id,
+            "score": latest_entry.score,
+            "emotions": latest_entry.emotions or [],
+            "notes": latest_entry.notes,
+            "created_at": latest_entry.created_at.isoformat(),
+            "ai_analysis": {
+                "sentiment": latest_entry.sentiment,
+                "energy_level": latest_entry.energy_level,
+                "risk_level": latest_entry.risk_level
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error fetching latest mood: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch latest mood entry")
+    
+# Add this endpoint to your main.py file (around line 500, after other endpoints)
+
+@app.get("/api/analytics/summary", response_model=Dict[str, Any])
+async def get_analytics_summary(
+    days: int = 30,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get comprehensive analytics summary for dashboard"""
+    try:
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        
+        # Get mood entries for the period
+        mood_entries = db.query(MoodEntry).filter(
+            and_(
+                MoodEntry.user_id == current_user.id,
+                MoodEntry.created_at >= cutoff_date
+            )
+        ).order_by(MoodEntry.created_at.desc()).all()
+        
+        if not mood_entries:
+            return {
+                "user_id": current_user.id,
+                "date_range": f"Last {days} days",
+                "total_entries": 0,
+                "average_score": 0.0,
+                "mood_trend": "no_data",
+                "crisis_incidents": 0,
+                "ai_insights": ["No mood data available yet - track your first mood!"],
+                "most_common_emotions": [],
+                "generated_at": datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Calculate analytics
+        total_entries = len(mood_entries)
+        average_score = round(sum(entry.score for entry in mood_entries) / total_entries, 1)
+        
+        # Calculate mood trend
+        if total_entries >= 3:
+            recent_scores = [entry.score for entry in mood_entries[:3]]
+            older_scores = [entry.score for entry in mood_entries[3:6]] if len(mood_entries) > 3 else recent_scores
+            recent_avg = sum(recent_scores) / len(recent_scores)
+            older_avg = sum(older_scores) / len(older_scores) if older_scores else recent_avg
+            
+            if recent_avg > older_avg + 0.5:
+                mood_trend = "improving"
+            elif recent_avg < older_avg - 0.5:
+                mood_trend = "declining"
+            else:
+                mood_trend = "stable"
+        else:
+            mood_trend = "insufficient_data"
+        
+        # Count crisis incidents
+        crisis_incidents = db.query(CrisisIncident).filter(
+            and_(
+                CrisisIncident.user_id == current_user.id,
+                CrisisIncident.created_at >= cutoff_date
+            )
+        ).count()
+        
+        # Most common emotions
+        all_emotions = []
+        for entry in mood_entries:
+            if entry.emotions:
+                all_emotions.extend(entry.emotions)
+        
+        emotion_counts = {}
+        for emotion in all_emotions:
+            emotion_counts[emotion] = emotion_counts.get(emotion, 0) + 1
+        
+        most_common_emotions = [
+            {"emotion": emotion, "count": count}
+            for emotion, count in sorted(emotion_counts.items(), key=lambda x: x[1], reverse=True)
+        ][:5]
+        
+        # Generate AI insights based on real data
+        ai_insights = []
+        
+        if average_score >= 7:
+            ai_insights.append("😊 Your mood has been consistently positive - great work!")
+        elif average_score <= 4:
+            ai_insights.append("💙 Consider focusing on self-care activities and support")
+        else:
+            ai_insights.append("😌 Your mood levels are in a healthy range")
+        
+        if mood_trend == "improving":
+            ai_insights.append("📈 Positive trend detected - your mood is improving over time")
+        elif mood_trend == "declining":
+            ai_insights.append("📉 Recent pattern shows some decline - consider additional support")
+        elif mood_trend == "stable":
+            ai_insights.append("📊 Your mood has been stable - consistency is valuable")
+        
+        if crisis_incidents > 0:
+            ai_insights.append(f"🚨 {crisis_incidents} crisis intervention(s) triggered - safety monitoring active")
+        else:
+            ai_insights.append("🛡️ No crisis incidents detected - safety systems monitoring")
+        
+        if most_common_emotions:
+            top_emotion = most_common_emotions[0]["emotion"]
+            ai_insights.append(f"🎭 Most frequent emotion: '{top_emotion}' - understanding patterns")
+        
+        # Add personalized insights based on entry count
+        if total_entries >= 7:
+            ai_insights.append("📊 Good tracking consistency - building valuable pattern data")
+        elif total_entries >= 3:
+            ai_insights.append("📝 Continue regular tracking for better insights")
+        
+        return {
+            "user_id": current_user.id,
+            "date_range": f"Last {days} days",
+            "total_entries": total_entries,
+            "average_score": average_score,
+            "mood_trend": mood_trend,
+            "crisis_incidents": crisis_incidents,
+            "ai_insights": ai_insights,
+            "most_common_emotions": most_common_emotions,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error generating analytics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate analytics summary")
+
 @app.get("/api/ai/models-complete", response_model=Dict[str, Any])
 async def get_complete_ai_models_info():
     """Get complete information about all loaded AI models"""

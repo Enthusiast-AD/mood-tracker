@@ -1,18 +1,11 @@
-/**
- * Protected Route Component - Day 4 Enhanced
- * Author: Enthusiast-AD
- * Date: 2025-07-03 14:45:26 UTC
- */
-
 import React from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
-const ProtectedRoute = ({ children, fallback = null }) => {
+const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth()
-  const location = useLocation()
 
-  // Show loading spinner while checking authentication
+  // Show loading spinner while checking auth
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -24,22 +17,12 @@ const ProtectedRoute = ({ children, fallback = null }) => {
     )
   }
 
-  // If not authenticated, redirect to login with return URL
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    if (fallback) {
-      return fallback
-    }
-    
-    return (
-      <Navigate 
-        to="/auth/login" 
-        state={{ from: location.pathname }}
-        replace 
-      />
-    )
+    return <Navigate to="/auth/login" replace />
   }
 
-  // User is authenticated, render children
+  // Render protected content
   return children
 }
 

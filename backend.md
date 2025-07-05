@@ -189,14 +189,14 @@ Complete the backend FastAPI server with full AI model integration, advanced ana
 
 
 ### Replace YOUR_TOKEN_HERE with the actual token from step - test user
+# Use your working API call
 curl -X POST http://localhost:8000/api/mood/track-complete \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2LCJleHAiOjE3NTE3MTM4MjUsImlhdCI6MTc1MTcxMDIyNSwidHlwZSI6ImFjY2VzcyJ9.CwVIFybIezumwN3vJr6tNGoAZhDer7rkuTpGZip-eL8" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2LCJleHAiOjE3NTE3MjEyMzIsImlhdCI6MTc1MTcxNzYzMiwidHlwZSI6ImFjY2VzcyJ9.6sxW1H_2DTAdsuFdIkvJCB-ssKwZMEmcR_SF6-ZpV5c" \
   -d '{
     "score": 2,
-    "emotions": ["sad", "anxious"],
-    "notes": "Don't know what to do.",
-    "activity": "reading",
-    "location": "home",
-    "weather": "cloudy",
+    "emotions": ["anxious"],
+    "notes": "feeling anxious about the upcoming deadline",
+    "activity": "testing",
+    "location": "home"
   }'

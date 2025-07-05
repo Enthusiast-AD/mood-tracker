@@ -1,16 +1,6 @@
-/**
- * Mood Tracking Context - Day 4 Enhanced
- * Author: Enthusiast-AD
- * Date: 2025-07-03 14:48:46 UTC
- * Features: Real-time analysis, crisis detection, database persistence
- */
-
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { useAuth } from './AuthContext'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const MoodContext = createContext()
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export const useMood = () => {
   const context = useContext(MoodContext)
@@ -21,29 +11,36 @@ export const useMood = () => {
 }
 
 export const MoodProvider = ({ children }) => {
-  const { getAuthHeaders, isAuthenticated } = useAuth()
-  
-  // State management
   const [moodHistory, setMoodHistory] = useState([])
   const [analytics, setAnalytics] = useState(null)
   const [insights, setInsights] = useState([])
   const [crisisIncidents, setCrisisIncidents] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [websocket, setWebsocket] = useState(null)
   const [realtimeAnalysis, setRealtimeAnalysis] = useState(null)
-  const [crisisAlert, setCrisisAlert] = useState(null)
+  const [websocket, setWebsocket] = useState(null)
 
-  // Load data when authenticated
+  // Enhanced real-time analysis state
+  const [aiDashboardData, setAiDashboardData] = useState({
+    currentSentiment: null,
+    energyLevel: null,
+    riskAssessment: null,
+    modelStatus: {
+      sentiment: 'active',
+      emotion: 'active', 
+      crisis: 'active',
+      prediction: 'active'
+    },
+    liveInsights: [],
+    analysisHistory: []
+  })
+
+  // WebSocket connection - DISABLED FOR NOW
   useEffect(() => {
-    if (isAuthenticated) {
-      loadMoodHistory()
-      loadAnalytics()
-      loadCrisisIncidents()
-      connectWebSocket()
-    } else {
-      // Clear data when not authenticated
-      resetMoodData()
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      // TODO: Enable when backend WebSocket is ready
+      console.log('🔗 WebSocket connection disabled - will enable when backend supports it')
+      // connectWebSocket(token)
     }
 
     return () => {
@@ -51,306 +48,150 @@ export const MoodProvider = ({ children }) => {
         websocket.close()
       }
     }
-  }, [isAuthenticated])
+  }, [])
 
-  const resetMoodData = () => {
-    setMoodHistory([])
-    setAnalytics(null)
-    setInsights([])
-    setCrisisIncidents([])
-    setRealtimeAnalysis(null)
-    setCrisisAlert(null)
+  const connectWebSocket = (token) => {
+    try {
+      // Check if backend WebSocket endpoint exists first
+      fetch('http://localhost:8000/ws')
+        .then(response => {
+          if (response.status === 404) {
+            console.log('📡 WebSocket endpoint not available yet - using polling fallback')
+            return
+          }
+          
+          const ws = new WebSocket(`ws://localhost:8000/ws/${token}`)
+          
+          ws.onopen = () => {
+            console.log('🔗 WebSocket connected for real-time AI updates')
+            setWebsocket(ws)
+          }
+
+          ws.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            console.log('📡 Real-time AI update received:', data)
+            
+            if (data.type === 'complete_ai_mood_tracked') {
+              setRealtimeAnalysis(data.complete_ai_analysis)
+              updateAIDashboard(data)
+            }
+          }
+
+          ws.onclose = () => {
+            console.log('🔌 WebSocket disconnected')
+            setWebsocket(null)
+          }
+
+          ws.onerror = (error) => {
+            console.log('⚠️ WebSocket not available - using fallback mode')
+          }
+        })
+        .catch(() => {
+          console.log('📡 Backend not available for WebSocket - continuing without real-time updates')
+        })
+        
+    } catch (error) {
+      console.log('⚠️ WebSocket initialization skipped:', error.message)
+    }
   }
 
-  const connectWebSocket = useCallback(() => {
-    if (!isAuthenticated) return
+  const updateAIDashboard = (analysisData) => {
+    setAiDashboardData(prev => ({
+      ...prev,
+      currentSentiment: analysisData.complete_ai_analysis?.sentiment_analysis?.sentiment,
+      energyLevel: analysisData.complete_ai_analysis?.sentiment_analysis?.energy_level,
+      riskAssessment: analysisData.complete_ai_analysis?.crisis_assessment?.risk_level,
+      liveInsights: [
+        ...analysisData.complete_ai_analysis?.ai_insights || [],
+        ...prev.liveInsights.slice(0, 9)
+      ]
+    }))
+  }
 
+  const getMoodTrend = () => {
+    if (moodHistory.length < 2) return 'stable'
+    
+    const recent = moodHistory.slice(0, 5)
+    const older = moodHistory.slice(5, 10)
+    
+    const recentAvg = recent.reduce((sum, entry) => sum + entry.score, 0) / recent.length
+    const olderAvg = older.length > 0 ? older.reduce((sum, entry) => sum + entry.score, 0) / older.length : recentAvg
+    
+    if (recentAvg > olderAvg + 0.5) return 'improving'
+    if (recentAvg < olderAvg - 0.5) return 'declining'
+    return 'stable'
+  }
+
+  const getAverageMood = () => {
+    if (moodHistory.length === 0) return 5
+    return Math.round(moodHistory.reduce((sum, entry) => sum + entry.score, 0) / moodHistory.length * 10) / 10
+  }
+
+  const refreshData = async () => {
+    setIsLoading(true)
     try {
-      const userId = `user_${Date.now()}`
-      const wsUrl = `ws://localhost:8000/ws/mood-monitor/${userId}`
-      const ws = new WebSocket(wsUrl)
-
-      ws.onopen = () => {
-        console.log('🔌 WebSocket connected for real-time mood monitoring')
-        setWebsocket(ws)
-      }
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        console.log('📡 Real-time data received:', data)
-
-        switch (data.type) {
-          case 'connected_enhanced':
-            console.log('✅ Enhanced monitoring active:', data.features)
-            break
-          
-          case 'real_time_analysis':
-            setRealtimeAnalysis(data.analysis)
-            if (data.crisis_alert) {
-              setCrisisAlert({
-                level: 'high',
-                message: 'Crisis indicators detected. Immediate support recommended.',
-                recommendations: data.recommendations,
-                timestamp: new Date().toISOString()
-              })
-            }
-            break
-          
-          case 'mood_tracked_enhanced':
-            // Update mood history with new entry
-            setMoodHistory(prev => [data.data, ...prev])
-            
-            if (data.intervention_required) {
-              setCrisisAlert({
-                level: 'critical',
-                message: 'Crisis intervention may be needed. Please seek immediate help.',
-                recommendations: ['Call 988', 'Contact emergency services', 'Reach out to a trusted person'],
-                timestamp: new Date().toISOString()
-              })
-            }
-            break
-        }
-      }
-
-      ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected')
-        setWebsocket(null)
-        
-        // Attempt to reconnect after 5 seconds
-        setTimeout(() => {
-          if (isAuthenticated) {
-            connectWebSocket()
-          }
-        }, 5000)
-      }
-
-      ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error)
-      }
-
+      // Fetch updated mood history, analytics, etc.
+      await fetchMoodHistory()
+      await fetchAnalytics()
     } catch (error) {
-      console.error('Failed to connect WebSocket:', error)
-    }
-  }, [isAuthenticated])
-
-  const loadMoodHistory = async (days = 30) => {
-    try {
-      setIsLoading(true)
-      
-      const response = await fetch(
-        `${API_BASE_URL}/api/mood/history?days=${days}`,
-        {
-          headers: {
-            ...getAuthHeaders(),
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-
-      if (response.ok) {
-        const data = await response.json()
-        setMoodHistory(data.history || [])
-        setAnalytics(data.analytics)
-        setInsights(data.insights || [])
-        console.log('✅ Mood history loaded:', data.history?.length, 'entries')
-      } else {
-        throw new Error('Failed to load mood history')
-      }
-    } catch (error) {
-      console.error('❌ Error loading mood history:', error)
-      // Try to load from localStorage as fallback
-      const offlineData = JSON.parse(localStorage.getItem('moodHistory') || '[]')
-      setMoodHistory(offlineData)
+      console.error('❌ Error refreshing data:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const loadAnalytics = async (days = 30) => {
+  const fetchMoodHistory = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/analytics/dashboard?days=${days}`,
-        {
-          headers: {
-            ...getAuthHeaders(),
-            'Content-Type': 'application/json'
-          }
+      const token = localStorage.getItem('authToken')
+      if (!token) return
+
+      const response = await fetch('http://localhost:8000/api/mood/history', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      )
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setMoodHistory(data.entries || [])
+      }
+    } catch (error) {
+      console.log('📊 Mood history not available yet')
+    }
+  }
+
+  const fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('authToken')
+      if (!token) return
+
+      const response = await fetch('http://localhost:8000/api/analytics/summary', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
 
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)
-        console.log('✅ Analytics loaded')
       }
     } catch (error) {
-      console.error('❌ Error loading analytics:', error)
+      console.log('📈 Analytics not available yet')
     }
-  }
-
-  const loadCrisisIncidents = async (days = 30) => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/crisis/incidents?days=${days}`,
-        {
-          headers: {
-            ...getAuthHeaders(),
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-
-      if (response.ok) {
-        const data = await response.json()
-        setCrisisIncidents(data)
-        console.log('✅ Crisis incidents loaded:', data.length)
-      }
-    } catch (error) {
-      console.error('❌ Error loading crisis incidents:', error)
-    }
-  }
-
-  const trackMood = async (moodData) => {
-    try {
-      setIsSubmitting(true)
-
-      // Send real-time data to WebSocket for immediate analysis
-      if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.send(JSON.stringify({
-          ...moodData,
-          timestamp: new Date().toISOString()
-        }))
-      }
-
-      // Submit to backend for database persistence
-      const response = await fetch(`${API_BASE_URL}/api/mood/track`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(moodData)
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        
-        // Update local state
-        setMoodHistory(prev => [result.data, ...prev])
-        
-        // Handle crisis response
-        if (result.intervention_required || result.crisis_response) {
-          setCrisisAlert({
-            level: 'critical',
-            message: 'Crisis intervention triggered. Please seek immediate help.',
-            recommendations: result.recommendations || ['Call 988', 'Contact emergency services'],
-            crisisResponse: result.crisis_response,
-            timestamp: new Date().toISOString()
-          })
-        }
-
-        // Refresh analytics
-        await loadAnalytics()
-        
-        console.log('✅ Mood tracked successfully:', result.database_id)
-        
-        return {
-          success: true,
-          data: result.data,
-          analysis: result.analysis,
-          recommendations: result.recommendations,
-          interventionRequired: result.intervention_required
-        }
-
-      } else {
-        throw new Error('Failed to track mood')
-      }
-
-    } catch (error) {
-      console.error('❌ Error tracking mood:', error)
-      
-      // Fallback to localStorage for offline functionality
-      const moodEntry = {
-        ...moodData,
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        offline: true
-      }
-      
-      const offlineData = JSON.parse(localStorage.getItem('offlineMoods') || '[]')
-      offlineData.push(moodEntry)
-      localStorage.setItem('offlineMoods', JSON.stringify(offlineData))
-      
-      return {
-        success: false,
-        error: error.message,
-        offline: true
-      }
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const dismissCrisisAlert = () => {
-    setCrisisAlert(null)
-  }
-
-  const refreshData = async () => {
-    await Promise.all([
-      loadMoodHistory(),
-      loadAnalytics(),
-      loadCrisisIncidents()
-    ])
-  }
-
-  const getMoodTrend = () => {
-    if (moodHistory.length < 2) return 'insufficient_data'
-    
-    const recent = moodHistory.slice(0, 7).map(entry => entry.score)
-    const older = moodHistory.slice(7, 14).map(entry => entry.score)
-    
-    if (older.length === 0) return 'insufficient_data'
-    
-    const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length
-    const olderAvg = older.reduce((a, b) => a + b, 0) / older.length
-    
-    const change = ((recentAvg - olderAvg) / olderAvg) * 100
-    
-    if (change > 10) return 'improving'
-    if (change < -10) return 'declining'
-    return 'stable'
-  }
-
-  const getAverageMood = () => {
-    if (moodHistory.length === 0) return 0
-    
-    const scores = moodHistory.map(entry => entry.score)
-    return Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
   }
 
   const value = {
-    // State
     moodHistory,
     analytics,
     insights,
     crisisIncidents,
     isLoading,
-    isSubmitting,
+    websocket,
     realtimeAnalysis,
-    crisisAlert,
-    websocket: !!websocket,
-    
-    // Actions
-    trackMood,
-    loadMoodHistory,
-    loadAnalytics,
-    loadCrisisIncidents,
-    refreshData,
-    dismissCrisisAlert,
-    
-    // Computed values
+    aiDashboardData,
     getMoodTrend,
-    getAverageMood
+    getAverageMood,
+    refreshData
   }
 
   return (

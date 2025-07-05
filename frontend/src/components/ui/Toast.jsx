@@ -1,18 +1,19 @@
-/**
- * Simple Toast System - Mental Health AI (No Theme Dependencies)
- * Author: Enthusiast-AD
- * Date: 2025-07-04 09:42:20 UTC
- * Fixed to work without ThemeProvider
- */
-
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const ToastContext = createContext()
 
 export const useToast = () => {
   const context = useContext(ToastContext)
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider')
+    // Return a fallback if Toast context is not available
+    return {
+      toast: {
+        success: (msg) => console.log('✅', msg),
+        error: (msg) => console.log('❌', msg),
+        warning: (msg) => console.log('⚠️', msg),
+        info: (msg) => console.log('ℹ️', msg)
+      }
+    }
   }
   return context
 }
@@ -20,16 +21,17 @@ export const useToast = () => {
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([])
 
-  const addToast = (toast) => {
-    const id = Math.random().toString(36).substr(2, 9)
-    const newToast = { id, ...toast, createdAt: Date.now() }
-
-    setToasts(prev => [...prev, newToast])
-
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id))
-    }, 5000)
+  const addToast = (message, type = 'info', duration = 5000) => {
+    const id = Date.now() + Math.random()
+    const toast = { id, message, type, duration }
+    
+    setToasts(prev => [...prev, toast])
+    
+    if (duration > 0) {
+      setTimeout(() => {
+        removeToast(id)
+      }, duration)
+    }
   }
 
   const removeToast = (id) => {
@@ -37,94 +39,91 @@ export const ToastProvider = ({ children }) => {
   }
 
   const toast = {
-    success: (message, options = {}) => addToast({ type: 'success', message, ...options }),
-    error: (message, options = {}) => addToast({ type: 'error', message, ...options }),
-    warning: (message, options = {}) => addToast({ type: 'warning', message, ...options }),
-    info: (message, options = {}) => addToast({ type: 'info', message, ...options })
+    success: (message, duration) => addToast(message, 'success', duration),
+    error: (message, duration) => addToast(message, 'error', duration),
+    warning: (message, duration) => addToast(message, 'warning', duration),
+    info: (message, duration) => addToast(message, 'info', duration)
   }
 
-  const value = { toast, toasts, removeToast }
-
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={{ toast }}>
       {children}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
   )
 }
 
-const ToastContainer = ({ toasts, removeToast }) => {
+const ToastContainer = ({ toasts, onRemove }) => {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+    <div className="fixed top-4 right-4 z-50 space-y-2">
       {toasts.map(toast => (
-        <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
+        <ToastItem 
+          key={toast.id} 
+          toast={toast} 
+          onRemove={onRemove} 
+        />
       ))}
     </div>
   )
 }
 
 const ToastItem = ({ toast, onRemove }) => {
-  // Removed useTheme dependency - using simple static styles
-  
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
+
+  const handleClose = () => {
+    setIsVisible(false)
+    setTimeout(() => onRemove(toast.id), 300)
+  }
+
   const getToastStyles = () => {
-    const baseStyles = 'p-4 rounded-lg shadow-lg border backdrop-blur-sm animate-slide-in'
+    const baseStyles = "transform transition-all duration-300 ease-in-out p-4 rounded-lg shadow-lg border-l-4 max-w-sm"
     
-    const typeStyles = {
-      success: 'bg-green-50 border-green-200 text-green-800',
-      error: 'bg-red-50 border-red-200 text-red-800',
-      warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-      info: 'bg-blue-50 border-blue-200 text-blue-800'
+    if (!isVisible) {
+      return `${baseStyles} translate-x-full opacity-0`
     }
 
-    return `${baseStyles} ${typeStyles[toast.type] || typeStyles.info}`
+    switch (toast.type) {
+      case 'success':
+        return `${baseStyles} bg-green-50 border-green-500 text-green-800`
+      case 'error':
+        return `${baseStyles} bg-red-50 border-red-500 text-red-800`
+      case 'warning':
+        return `${baseStyles} bg-yellow-50 border-yellow-500 text-yellow-800`
+      default:
+        return `${baseStyles} bg-blue-50 border-blue-500 text-blue-800`
+    }
   }
 
   const getIcon = () => {
-    const icons = {
-      success: '✅',
-      error: '❌',
-      warning: '⚠️',
-      info: 'ℹ️'
+    switch (toast.type) {
+      case 'success': return '✅'
+      case 'error': return '❌'
+      case 'warning': return '⚠️'
+      default: return 'ℹ️'
     }
-    return icons[toast.type] || icons.info
   }
 
   return (
     <div className={getToastStyles()}>
-      <div className="flex items-start space-x-3">
-        <div className="text-xl">{getIcon()}</div>
-        <div className="flex-1">
-          <div className="text-sm font-medium">{toast.message}</div>
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-2">
+          <span className="text-lg">{getIcon()}</span>
+          <p className="text-sm font-medium flex-1">{toast.message}</p>
         </div>
         <button
-          onClick={() => onRemove(toast.id)}
-          className="text-current opacity-50 hover:opacity-100 transition-opacity"
+          onClick={handleClose}
+          className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="Close"
         >
           ✕
         </button>
       </div>
-      
-      {/* Simple slide-in animation with CSS */}
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
     </div>
   )
 }
-
-export default ToastProvider

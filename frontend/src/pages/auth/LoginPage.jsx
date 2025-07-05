@@ -1,11 +1,5 @@
-/**
- * Login Page - Day 4 Enhanced
- * Author: Enthusiast-AD
- * Date: 2025-07-03 14:45:26 UTC
- */
-
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 const LoginPage = () => {
@@ -14,81 +8,63 @@ const LoginPage = () => {
     password: ''
   })
   const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   
-  const { login, isAuthenticated, isLoading } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
-  
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      const from = location.state?.from || '/dashboard'
-      navigate(from, { replace: true })
-    }
-  }, [isAuthenticated, isLoading, navigate, location])
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [e.target.name]: e.target.value
-    })
-    
+    }))
     // Clear error when user starts typing
     if (error) setError('')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    setIsLoading(true)
     setError('')
 
-    const result = await login(formData.username, formData.password)
-    
-    if (result.success) {
-      // Navigate to intended page or dashboard
-      const from = location.state?.from || '/dashboard'
-      navigate(from, { replace: true })
-    } else {
-      setError(result.error)
+    try {
+      const result = await login(formData)
+      
+      if (result.success) {
+        console.log('✅ Login successful, redirecting...')
+        navigate('/dashboard')
+      } else {
+        // Make sure we're setting a string, not an object
+        const errorMessage = typeof result.error === 'string' 
+          ? result.error 
+          : result.error?.detail || 'Login failed'
+        setError(errorMessage)
+      }
+    } catch (err) {
+      console.error('❌ Login error:', err)
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-    
-    setIsSubmitting(false)
-  }
-
-  // Show loading spinner while checking initial auth state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="text-6xl mb-4">🧠</div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            🧠 Mental Health AI
+          </h1>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+            Sign in to your account
           </h2>
           <p className="text-gray-600">
-            Sign in to continue your mental health journey
+            Access your AI-powered mental health dashboard
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                <div className="flex items-center">
-                  <span className="text-red-500 mr-2">⚠️</span>
-                  {error}
-                </div>
-              </div>
-            )}
-
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
                 Username or Email
@@ -98,11 +74,12 @@ const LoginPage = () => {
                 name="username"
                 type="text"
                 required
-                value={formData.username}
-                onChange={handleChange}
+                autoComplete="username"
                 className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your username or email"
-                disabled={isSubmitting}
+                value={formData.username}
+                onChange={handleChange}
+                disabled={isLoading}
               />
             </div>
 
@@ -115,64 +92,82 @@ const LoginPage = () => {
                 name="password"
                 type="password"
                 required
-                value={formData.password}
-                onChange={handleChange}
+                autoComplete="current-password"
                 className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your password"
-                disabled={isSubmitting}
+                value={formData.password}
+                onChange={handleChange}
+                disabled={isLoading}
               />
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white font-medium ${
-                isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'
-              } transition-colors`}
-            >
-              {isSubmitting ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Signing In...
-                </div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </form>
+          {/* Error Display - FIXED */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-xl mr-2">❌</span>
+                <span className="font-medium">
+                  {/* Ensure error is always a string */}
+                  {typeof error === 'string' ? error : 'An error occurred'}
+                </span>
+              </div>
+            </div>
+          )}
 
-          <div className="mt-6 text-center">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white font-semibold transition-colors ${
+              isLoading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'
+            }`}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Signing in...
+              </>
+            ) : (
+              'Sign In'
+            )}
+          </button>
+
+          <div className="text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}
               <Link 
                 to="/auth/register" 
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-blue-600 hover:text-blue-700 font-semibold"
               >
-                Create one here
+                Sign up here
               </Link>
             </p>
           </div>
+        </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="text-center">
-              <p className="text-sm text-gray-500 mb-3">Demo Accounts (for testing):</p>
-              <div className="space-y-2 text-xs text-gray-400">
-                <p>Username: demo | Password: demo123456</p>
-                <p>Or create your own account above</p>
-              </div>
-            </div>
+        {/* Demo credentials */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-blue-800 mb-2">
+            💡 Demo Credentials
+          </h3>
+          <div className="text-sm text-blue-700 space-y-1">
+            <p><strong>Username:</strong> aitest_user</p>
+            <p><strong>Password:</strong> password123</p>
           </div>
-        </div>
-
-        <div className="text-center">
-          <Link 
-            to="/" 
-            className="text-blue-600 hover:text-blue-700 font-medium"
+          <button
+            type="button"
+            onClick={() => {
+              setFormData({
+                username: 'aitest_user',
+                password: 'password123'
+              })
+            }}
+            className="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
           >
-            ← Back to Home
-          </Link>
+            Use Demo Credentials
+          </button>
         </div>
       </div>
     </div>

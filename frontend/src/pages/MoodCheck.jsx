@@ -1,10 +1,3 @@
-/**
- * Mood Check Page - Mental Health AI (Fixed)
- * Author: Enthusiast-AD
- * Date: 2025-07-04 09:42:20 UTC
- * Fixed with authentication and better error handling
- */
-
 import { useState, useEffect } from 'react'
 import { useToast } from '../components/ui/Toast'
 
@@ -19,7 +12,7 @@ function MoodCheck() {
     location: '',
     weather: ''
   })
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [analysis, setAnalysis] = useState(null)
   const [recommendations, setRecommendations] = useState([])
@@ -55,14 +48,14 @@ function MoodCheck() {
   ]
 
   const activities = [
-    'Work', 'Exercise', 'Socializing', 'Relaxing', 'Studying', 
+    'Work', 'Exercise', 'Socializing', 'Relaxing', 'Studying',
     'Commuting', 'Sleeping', 'Eating', 'Entertainment', 'Other'
   ]
 
   const handleEmotionToggle = (emotionId) => {
     setMoodEntry(prev => ({
       ...prev,
-      emotions: prev.emotions.includes(emotionId) 
+      emotions: prev.emotions.includes(emotionId)
         ? prev.emotions.filter(id => id !== emotionId)
         : [...prev.emotions, emotionId]
     }))
@@ -79,9 +72,8 @@ function MoodCheck() {
   }
 
   const generateMockAnalysis = (moodData) => {
-    // Generate mock analysis when API is not available
     const score = moodData.score
-    
+
     return {
       sentiment: score >= 6 ? 'positive' : score <= 4 ? 'negative' : 'neutral',
       sentiment_confidence: 0.85,
@@ -119,7 +111,7 @@ function MoodCheck() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (moodEntry.emotions.length === 0) {
       toast.warning('Please select at least one emotion')
       return
@@ -127,102 +119,93 @@ function MoodCheck() {
 
     setIsSubmitting(true)
     setCrisisAlert(false)
-    
-    const moodData = {
-      ...moodEntry,
-      user_id: 'demo_user',
-      timestamp: new Date().toISOString()
-    }
 
     try {
-      if (!isOnline) {
-        // Offline mode
-        saveToLocalStorage(moodData)
-        const mockAnalysis = generateMockAnalysis(moodData)
-        const mockRecommendations = generateMockRecommendations(moodData.score)
-        
+      // Get auth token
+      const authToken = localStorage.getItem('authToken')
+
+      if (!authToken) {
+        // Handle non-authenticated users with local analysis
+        const mockAnalysis = generateMockAnalysis(moodEntry)
+        const mockRecommendations = generateMockRecommendations(moodEntry.score)
+
         setAnalysis(mockAnalysis)
         setRecommendations(mockRecommendations)
-        
-        if (mockAnalysis.intervention_required) {
-          setCrisisAlert(true)
-        }
-        
-        toast.info('📱 Mood saved offline. Will sync when online.')
+
+        saveToLocalStorage(moodEntry)
+        toast.info('🤖 Mood analyzed locally (sign in for cloud sync)')
         resetForm()
         return
       }
 
-      // Try to get auth token
-      const authToken = localStorage.getItem('authToken')
-      
-      const headers = {
-        'Content-Type': 'application/json'
-      }
-
-      // Add auth header if available
-      if (authToken) {
-        headers['Authorization'] = `Bearer ${authToken}`
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/mood/track`, {
+      // Try the complete AI endpoint first
+      let response = await fetch(`${API_BASE_URL}/api/mood/track-complete`, {
         method: 'POST',
-        headers,
-        body: JSON.stringify(moodData)
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify(moodEntry)
       })
+
+      // If complete endpoint fails, try basic endpoint
+      if (!response.ok && response.status === 404) {
+        console.log('🔄 Trying basic mood tracking endpoint...')
+        response = await fetch(`${API_BASE_URL}/api/mood/track`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(moodEntry)
+        })
+      }
 
       if (response.ok) {
         const result = await response.json()
-        setAnalysis(result.analysis)
-        setRecommendations(result.recommendations || generateMockRecommendations(moodData.score))
-        
-        if (result.intervention_required) {
-          setCrisisAlert(true)
+
+        // Handle different response formats
+        if (result.complete_ai_analysis) {
+          setAnalysis(result.complete_ai_analysis)
+          setRecommendations(result.recommendations || [])
+          if (result.intervention_triggered) {
+            setCrisisAlert(true)
+          }
+        } else if (result.analysis) {
+          setAnalysis(result.analysis)
+          setRecommendations(result.recommendations || generateMockRecommendations(moodEntry.score))
+        } else {
+          setAnalysis(generateMockAnalysis(moodEntry))
+          setRecommendations(generateMockRecommendations(moodEntry.score))
         }
-        
+
         toast.success('🎉 Mood tracked successfully!')
         resetForm()
-        
-      } else if (response.status === 403) {
-        // Authentication required - use local analysis
-        console.log('Authentication required, using local analysis')
-        
-        const mockAnalysis = generateMockAnalysis(moodData)
-        const mockRecommendations = generateMockRecommendations(moodData.score)
-        
-        setAnalysis(mockAnalysis)
-        setRecommendations(mockRecommendations)
-        
-        if (mockAnalysis.intervention_required) {
-          setCrisisAlert(true)
-        }
-        
-        saveToLocalStorage(moodData)
-        toast.info('🤖 Mood analyzed locally (authentication required for cloud sync)')
-        resetForm()
-        
+
       } else {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`API error: ${response.status}`)
       }
-      
+
     } catch (error) {
       console.error('Error submitting mood:', error)
-      
-      // Fallback to local analysis
-      const mockAnalysis = generateMockAnalysis(moodData)
-      const mockRecommendations = generateMockRecommendations(moodData.score)
-      
+
+      // Always provide fallback analysis
+      const mockAnalysis = generateMockAnalysis(moodEntry)
+      const mockRecommendations = generateMockRecommendations(moodEntry.score)
+
       setAnalysis(mockAnalysis)
       setRecommendations(mockRecommendations)
-      
-      if (mockAnalysis.intervention_required) {
-        setCrisisAlert(true)
+
+      saveToLocalStorage(moodEntry)
+
+      if (error.message.includes('404')) {
+        toast.info('🔄 Using local analysis (API endpoint not found)')
+      } else {
+        toast.info('🔄 Using local analysis (connection issue)')
       }
-      
-      saveToLocalStorage(moodData)
-      toast.info('🔄 Using local analysis (server unavailable)')
+
       resetForm()
-      
+
     } finally {
       setIsSubmitting(false)
     }
@@ -254,16 +237,18 @@ function MoodCheck() {
     return 'text-red-600'
   }
 
+  // MAIN RENDER - Make sure this is returning JSX
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Simple Breadcrumb */}
-      <nav className="flex items-center space-x-1 text-sm mb-6" aria-label="Breadcrumb">
-        <div className="flex items-center space-x-1">
-          <span className="text-blue-600">🏠 Home</span>
-          <span className="mx-2 text-gray-400">/</span>
-          <span className="text-blue-600 font-medium">📝 Track Mood</span>
-        </div>
-      </nav>
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* Test if component is rendering */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          🧠 Mood Check Test
+        </h1>
+        <p className="text-gray-600">
+          If you can see this, the component is loading correctly!
+        </p>
+      </div>
 
       {/* Offline Status */}
       {!isOnline && (
@@ -278,13 +263,13 @@ function MoodCheck() {
           <h3 className="font-bold">🆘 Crisis Support Available</h3>
           <p>Based on your mood entry, we want to make sure you have immediate support:</p>
           <div className="mt-2">
-            <button 
+            <button
               onClick={() => window.open('tel:988')}
               className="bg-red-600 text-white px-4 py-2 rounded mr-2 hover:bg-red-700 transition-colors"
             >
               Call 988 (Crisis Lifeline)
             </button>
-            <button 
+            <button
               onClick={() => setCrisisAlert(false)}
               className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
             >
@@ -295,10 +280,10 @@ function MoodCheck() {
       )}
 
       <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-8">
+        <h2 className="text-3xl font-bold text-center mb-8">
           How are you feeling today? {getMoodEmoji()}
-        </h1>
-        
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Mood Slider */}
           <div>
@@ -336,11 +321,10 @@ function MoodCheck() {
                   key={emotion.id}
                   type="button"
                   onClick={() => handleEmotionToggle(emotion.id)}
-                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                    moodEntry.emotions.includes(emotion.id)
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${moodEntry.emotions.includes(emotion.id)
                       ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <div className="text-2xl mb-1">{emotion.emoji}</div>
                   <div className="text-sm font-medium">{emotion.label}</div>
@@ -403,11 +387,10 @@ function MoodCheck() {
           <button
             type="submit"
             disabled={isSubmitting || moodEntry.emotions.length === 0}
-            className={`w-full font-semibold py-4 px-6 rounded-lg transition-all duration-200 ${
-              isSubmitting || moodEntry.emotions.length === 0
+            className={`w-full font-semibold py-4 px-6 rounded-lg transition-all duration-200 ${isSubmitting || moodEntry.emotions.length === 0
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-            }`}
+              }`}
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
@@ -424,22 +407,65 @@ function MoodCheck() {
         {analysis && (
           <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
             <h3 className="text-xl font-semibold mb-4">🔮 Mood Analysis Results</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p><strong>Sentiment:</strong> <span className="capitalize">{analysis.sentiment}</span></p>
-                <p><strong>Energy Level:</strong> <span className="capitalize">{analysis.energy_level}</span></p>
-                <p><strong>Risk Level:</strong> <span className="capitalize">{analysis.risk_level}</span></p>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div>
+                  <span className="font-semibold text-gray-700">Sentiment:</span>
+                  <span className={`ml-2 capitalize font-bold ${analysis.sentiment === 'positive' ? 'text-green-600' :
+                      analysis.sentiment === 'negative' ? 'text-red-600' : 'text-blue-600'
+                    }`}>
+                    {analysis.sentiment || 'Neutral'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-gray-700">Energy Level:</span>
+                  <span className={`ml-2 capitalize font-bold ${analysis.energy_level === 'high' ? 'text-green-600' :
+                      analysis.energy_level === 'low' ? 'text-red-600' : 'text-yellow-600'
+                    }`}>
+                    {analysis.energy_level || 'Moderate'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-gray-700">Risk Level:</span>
+                  <span className={`ml-2 capitalize font-bold ${analysis.risk_level === 'high' ? 'text-red-600' :
+                      analysis.risk_level === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
+                    {analysis.risk_level || 'Low'}
+                  </span>
+                </div>
               </div>
-              <div>
-                <p><strong>Confidence:</strong> {Math.round((analysis.sentiment_confidence || 0.8) * 100)}%</p>
-                <p><strong>Analysis Method:</strong> <span className="capitalize">{analysis.analysis_method?.replace('_', ' ')}</span></p>
-                <p><strong>Emotional Complexity:</strong> {analysis.emotional_complexity}/10</p>
+
+              <div className="space-y-3">
+                <div>
+                  <span className="font-semibold text-gray-700">Confidence:</span>
+                  <span className="ml-2 font-bold text-blue-600">
+                    {Math.round((analysis.sentiment_confidence || analysis.confidence || 0.7) * 100)}%
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-gray-700">Analysis Method:</span>
+                  <span className="ml-2 capitalize text-gray-600">
+                    {analysis.analysis_method?.replace('_', ' ') || 'AI Analysis'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="font-semibold text-gray-700">Emotional Complexity:</span>
+                  <span className="ml-2 font-bold text-purple-600">
+                    {analysis.emotional_complexity || moodEntry.emotions.length}/10
+                  </span>
+                </div>
               </div>
             </div>
+
+            {/* Risk Indicators */}
             {analysis.risk_indicators && analysis.risk_indicators.length > 0 && (
-              <div className="mt-4">
-                <p><strong>Risk Indicators:</strong></p>
-                <ul className="list-disc list-inside text-sm">
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="font-semibold text-yellow-800 mb-2">⚠️ Risk Indicators:</p>
+                <ul className="list-disc list-inside text-sm text-yellow-700">
                   {analysis.risk_indicators.map((indicator, index) => (
                     <li key={index}>{indicator}</li>
                   ))}
