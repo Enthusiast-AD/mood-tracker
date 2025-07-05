@@ -2,6 +2,12 @@ README.md
 pyproject.toml
 app/__init__.py
 app/database.py
+app/ai/__init__.py
+app/ai/crisis_detector.py
+app/ai/emotion_classifier.py
+app/ai/model_manager.py
+app/ai/sentiment_analyzer.py
+app/ai/text_analyzer.py
 app/api/__init__.py
 app/auth/__init__.py
 app/auth/auth_handler.py
@@ -12,8 +18,10 @@ app/models/analytics.py
 app/models/mood.py
 app/models/user.py
 app/services/__init__.py
+app/services/crisis_management.py
 mental_health_backend.egg-info/PKG-INFO
 mental_health_backend.egg-info/SOURCES.txt
 mental_health_backend.egg-info/dependency_links.txt
 mental_health_backend.egg-info/requires.txt
 mental_health_backend.egg-info/top_level.txt
+tests/test_e2e_production.py
