@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
+import MoodTrendChart from '../charts/MoodTrendChart'
+import EmotionDistributionChart from '../charts/EmotionDistributionChart'
+import EnhancedMetricCard from './EnhancedMetricCard'
+import StaggeredCards from '../animations/StaggeredCards'
+import { DashboardSkeleton } from '../ui/LoadingStates'
+import { showToast } from '../ui/EnhancedToast'
 
 const AIInsightsDashboard = () => {
   const { isAuthenticated } = useAuth()
   const [realtimeAnalysis, setRealtimeAnalysis] = useState(null)
   const [moodHistory, setMoodHistory] = useState([])
   const [lastMoodEntry, setLastMoodEntry] = useState(null)
-  const [analytics, setAnalytics] = useState(null) // Add analytics state
+  const [analytics, setAnalytics] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [backendStatus, setBackendStatus] = useState('checking')
 
@@ -17,12 +24,12 @@ const AIInsightsDashboard = () => {
     if (isAuthenticated) {
       checkBackendConnection()
       fetchRealMoodHistory()
-      fetchUserAnalytics() // Make sure this is called
+      fetchUserAnalytics()
       
       // Poll for updates every 30 seconds
       const interval = setInterval(() => {
         fetchRealMoodHistory()
-        fetchUserAnalytics() // Also refresh analytics
+        fetchUserAnalytics()
       }, 30000)
 
       return () => clearInterval(interval)
@@ -36,12 +43,15 @@ const AIInsightsDashboard = () => {
         const data = await response.json()
         setBackendStatus('connected')
         console.log('✅ Backend connected:', data.service)
+        showToast.success('🎉 AI Backend Connected Successfully!')
       } else {
         setBackendStatus('error')
+        showToast.error('⚠️ Backend Connection Error')
       }
     } catch (error) {
       console.error('❌ Backend connection failed:', error)
       setBackendStatus('offline')
+      showToast.warning('📡 Backend Offline - Using Local Data')
     }
   }
 
@@ -67,7 +77,7 @@ const AIInsightsDashboard = () => {
       if (response.ok) {
         const analyticsData = await response.json()
         console.log('✅ DASHBOARD: Analytics data received:', analyticsData)
-        setAnalytics(analyticsData) // Set the analytics state
+        setAnalytics(analyticsData)
         
         // Update real-time analysis with analytics data
         if (analyticsData) {
@@ -148,24 +158,6 @@ const AIInsightsDashboard = () => {
     setRealtimeAnalysis(analysis)
   }
 
-  const getSentimentColor = (sentiment) => {
-    switch (sentiment) {
-      case 'positive': return 'text-green-600'
-      case 'negative': return 'text-red-600'
-      case 'neutral': return 'text-blue-600'
-      default: return 'text-gray-600'
-    }
-  }
-
-  const getRiskColor = (risk) => {
-    switch (risk) {
-      case 'high': return 'text-red-600 bg-red-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'low': return 'text-green-600 bg-green-100'
-      default: return 'text-gray-600 bg-gray-100'
-    }
-  }
-
   const getBackendStatusColor = () => {
     switch (backendStatus) {
       case 'connected': return 'bg-green-500'
@@ -195,232 +187,409 @@ const AIInsightsDashboard = () => {
     return []
   }
 
+  // Helper function to get trend direction
+  const getTrendDirection = (value, type) => {
+    if (type === 'sentiment') {
+      return value === 'positive' ? 'up' : value === 'negative' ? 'down' : 'stable'
+    }
+    if (type === 'energy') {
+      return value === 'high' ? 'up' : value === 'low' ? 'down' : 'stable'
+    }
+    if (type === 'risk') {
+      return value === 'low' ? 'up' : value === 'high' ? 'down' : 'stable'
+    }
+    return 'up' // Default for entries count
+  }
+
+  // Show loading skeleton while data is loading
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Backend Status Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6 shadow-lg">
+    <div className="space-y-8">
+      {/* Enhanced Backend Status Header with Animation */}
+      <motion.div 
+        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6 shadow-lg"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="text-3xl">🧠</div>
+            <motion.div 
+              className="text-3xl"
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+            >
+              🧠
+            </motion.div>
             <div>
-              <h1 className="text-2xl font-bold">Real AI Mental Health Assistant</h1>
+              <h1 className="text-2xl font-bold">Enhanced AI Mental Health Assistant</h1>
               <p className="text-blue-100">
                 {backendStatus === 'connected' 
-                  ? 'Connected to live AI backend system' 
+                  ? 'Connected to live AI backend system with beautiful visualizations' 
                   : 'Backend connection status'}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${getBackendStatusColor()}`}></div>
+            <motion.div 
+              className={`w-3 h-3 rounded-full ${getBackendStatusColor()}`}
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <span className="text-sm font-medium">{getBackendStatusText()}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Real-time AI Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Current Sentiment */}
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Current Sentiment</p>
-              <div className={`text-2xl font-bold capitalize ${getSentimentColor(realtimeAnalysis?.sentiment)}`}>
-                {realtimeAnalysis?.sentiment || 'No data yet'}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                {realtimeAnalysis ? 
-                  `${Math.round((realtimeAnalysis.confidence || 0) * 100)}% confidence` : 
-                  'Track a mood to see analysis'
-                }
-              </p>
-            </div>
-            <div className="text-3xl">📊</div>
-          </div>
-        </div>
+      {/* Enhanced AI Metrics with Staggered Animation */}
+      <StaggeredCards className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <EnhancedMetricCard
+          title="Current Sentiment"
+          value={realtimeAnalysis?.sentiment || 'No data'}
+          subtitle={realtimeAnalysis ? 
+            `${Math.round((realtimeAnalysis.confidence || 0) * 100)}% confidence` : 
+            'Track a mood to see analysis'
+          }
+          icon="📊"
+          color="blue"
+          trend={getTrendDirection(realtimeAnalysis?.sentiment, 'sentiment')}
+        />
 
-        {/* Energy Level */}
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Energy Level</p>
-              <div className="text-2xl font-bold text-green-600 capitalize">
-                {realtimeAnalysis?.energy_estimate || 'Unknown'}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                {realtimeAnalysis ? 'From last mood entry' : 'No recent data'}
-              </p>
-            </div>
-            <div className="text-3xl">⚡</div>
-          </div>
-        </div>
+        <EnhancedMetricCard
+          title="Energy Level"
+          value={realtimeAnalysis?.energy_estimate || 'Unknown'}
+          subtitle={realtimeAnalysis ? 'From last mood entry' : 'No recent data'}
+          icon="⚡"
+          color="green"
+          trend={getTrendDirection(realtimeAnalysis?.energy_estimate, 'energy')}
+        />
 
-        {/* Risk Assessment */}
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-yellow-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Risk Assessment</p>
-              <div className={`text-2xl font-bold capitalize ${getRiskColor(realtimeAnalysis?.risk_level).split(' ')[0]}`}>
-                {realtimeAnalysis?.risk_level || 'No assessment'}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                {backendStatus === 'connected' ? 'AI monitoring active' : 'Backend disconnected'}
-              </p>
-            </div>
-            <div className="text-3xl">🛡️</div>
-          </div>
-        </div>
+        <EnhancedMetricCard
+          title="Risk Assessment"
+          value={realtimeAnalysis?.risk_level || 'No assessment'}
+          subtitle={backendStatus === 'connected' ? 'AI monitoring active' : 'Backend disconnected'}
+          icon="🛡️"
+          color={realtimeAnalysis?.risk_level === 'high' ? 'red' : realtimeAnalysis?.risk_level === 'medium' ? 'yellow' : 'green'}
+          trend={getTrendDirection(realtimeAnalysis?.risk_level, 'risk')}
+        />
 
-        {/* Entries Analyzed */}
-        <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-purple-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Entries Tracked</p>
-              <div className="text-2xl font-bold text-purple-600">
-                {analytics?.total_entries || moodHistory?.length || 0}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                {isLoading ? 'Loading...' : 'Real database count'}
-              </p>
-            </div>
-            <div className="text-3xl">📈</div>
-          </div>
-        </div>
-      </div>
+        <EnhancedMetricCard
+          title="Entries Tracked"
+          value={analytics?.total_entries || moodHistory?.length || 0}
+          subtitle={isLoading ? 'Loading...' : 'Real database count'}
+          icon="📈"
+          color="purple"
+          trend="up"
+        />
+      </StaggeredCards>
 
-      {/* Real AI Insights Feed - FIXED */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      {/* Beautiful Charts Section with Staggered Animation */}
+      <StaggeredCards className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <MoodTrendChart moodHistory={moodHistory} />
+        <EmotionDistributionChart moodHistory={moodHistory} />
+      </StaggeredCards>
+
+      {/* Enhanced AI Insights Feed with Animations */}
+      <motion.div 
+        className="bg-white rounded-lg shadow-lg p-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        whileHover={{ shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
-            <div className="text-2xl">🔮</div>
-            <h2 className="text-xl font-bold">Live AI Insights</h2>
+            <motion.div 
+              className="text-2xl"
+              animate={{ 
+                y: [0, -5, 0],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+            >
+              🔮
+            </motion.div>
+            <h2 className="text-xl font-bold text-gray-800">Live AI Insights</h2>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${backendStatus === 'connected' ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+            <motion.div 
+              className={`w-2 h-2 rounded-full ${backendStatus === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <span className="text-sm text-gray-600">
               {backendStatus === 'connected' ? 'Real-time data' : 'No connection'}
             </span>
           </div>
         </div>
 
-        <div className="space-y-3">
-          {getAIInsights().length > 0 ? (
-            getAIInsights().map((insight, index) => (
-              <div key={index} className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-                <p className="text-blue-800 font-medium">{insight}</p>
-                <p className="text-xs text-blue-600 mt-1">
-                  Real Backend AI Analysis - {new Date().toLocaleTimeString()}
+        <AnimatePresence mode="wait">
+          <div className="space-y-3">
+            {getAIInsights().length > 0 ? (
+              getAIInsights().map((insight, index) => (
+                <motion.div 
+                  key={index}
+                  className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-lg"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  whileHover={{ x: 5, transition: { duration: 0.2 } }}
+                >
+                  <p className="text-blue-800 font-medium">{insight}</p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Real Backend AI Analysis - {new Date().toLocaleTimeString()}
+                  </p>
+                </motion.div>
+              ))
+            ) : (
+              <motion.div 
+                className="text-center py-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <motion.div 
+                  className="text-6xl mb-4"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  🎯
+                </motion.div>
+                <h3 className="text-lg font-semibold mb-2">No AI Insights Yet</h3>
+                <p className="text-gray-600 mb-4">
+                  {backendStatus === 'connected' 
+                    ? 'Track a mood to see real AI analysis here' 
+                    : 'Backend connection needed for real insights'
+                  }
                 </p>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-lg font-semibold mb-2">No AI Insights Yet</h3>
-              <p className="text-gray-600 mb-4">
-                {backendStatus === 'connected' 
-                  ? 'Track a mood to see real AI analysis here' 
-                  : 'Backend connection needed for real insights'
-                }
-              </p>
-              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>Status:</strong> {getBackendStatusText()}
-                  {backendStatus === 'connected' && ' - Ready for real AI analysis!'}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Analytics Summary - NEW */}
-      {analytics && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4">📊 Analytics Summary</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{analytics.total_entries}</div>
-              <div className="text-sm text-gray-600">Total Entries</div>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{analytics.average_score}</div>
-              <div className="text-sm text-gray-600">Average Score</div>
-            </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600 capitalize">{analytics.mood_trend}</div>
-              <div className="text-sm text-gray-600">Mood Trend</div>
-            </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{analytics.crisis_incidents}</div>
-              <div className="text-sm text-gray-600">Crisis Incidents</div>
-            </div>
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 p-4 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Status:</strong> {getBackendStatusText()}
+                    {backendStatus === 'connected' && ' - Ready for real AI analysis!'}
+                  </p>
+                </div>
+              </motion.div>
+            )}
           </div>
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Enhanced Analytics Summary with Staggered Cards */}
+      {analytics && (
+        <motion.div 
+          className="bg-white rounded-lg shadow-lg p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <h3 className="text-xl font-bold mb-6 text-gray-800 flex items-center">
+            <span className="mr-2">📊</span>
+            Analytics Summary
+          </h3>
+          <StaggeredCards className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <motion.div 
+              className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg"
+              whileHover={{ scale: 1.05, y: -2 }}
+            >
+              <div className="text-3xl font-bold text-blue-600 mb-1">
+                {analytics.total_entries}
+              </div>
+              <div className="text-sm text-gray-600">Total Entries</div>
+            </motion.div>
+            <motion.div 
+              className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg"
+              whileHover={{ scale: 1.05, y: -2 }}
+            >
+              <div className="text-3xl font-bold text-green-600 mb-1">
+                {analytics.average_score}
+              </div>
+              <div className="text-sm text-gray-600">Average Score</div>
+            </motion.div>
+            <motion.div 
+              className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg"
+              whileHover={{ scale: 1.05, y: -2 }}
+            >
+              <div className="text-3xl font-bold text-yellow-600 capitalize mb-1">
+                {analytics.mood_trend}
+              </div>
+              <div className="text-sm text-gray-600">Mood Trend</div>
+            </motion.div>
+            <motion.div 
+              className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-lg"
+              whileHover={{ scale: 1.05, y: -2 }}
+            >
+              <div className="text-3xl font-bold text-red-600 mb-1">
+                {analytics.crisis_incidents}
+              </div>
+              <div className="text-sm text-gray-600">Crisis Incidents</div>
+            </motion.div>
+          </StaggeredCards>
           
-          {/* Most Common Emotions */}
+          {/* Enhanced Most Common Emotions with Staggered Animation */}
           {analytics.most_common_emotions && analytics.most_common_emotions.length > 0 && (
             <div className="mt-6">
-              <h4 className="font-semibold mb-3">Most Common Emotions</h4>
-              <div className="flex flex-wrap gap-2">
+              <h4 className="font-semibold mb-4 text-gray-700 flex items-center">
+                <span className="mr-2">🎭</span>
+                Most Common Emotions
+              </h4>
+              <motion.div 
+                className="flex flex-wrap gap-3"
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: {
+                      staggerChildren: 0.1
+                    }
+                  }
+                }}
+              >
                 {analytics.most_common_emotions.map((emotion, index) => (
-                  <span 
+                  <motion.span 
                     key={index}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                    className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium"
+                    variants={{
+                      hidden: { opacity: 0, scale: 0.8 },
+                      show: { opacity: 1, scale: 1 }
+                    }}
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     {emotion.emotion} ({emotion.count})
-                  </span>
+                  </motion.span>
                 ))}
-              </div>
+              </motion.div>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
-      {/* Real Mood History */}
+      {/* Enhanced Real Mood History with Staggered Animations */}
       {moodHistory.length > 0 && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4">📊 Recent Real Mood Entries</h3>
-          <div className="space-y-3">
+        <motion.div 
+          className="bg-white rounded-lg shadow-lg p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
+            <span className="mr-2">📝</span>
+            Recent Mood Entries
+          </h3>
+          <motion.div 
+            className="space-y-3"
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: {
+                transition: {
+                  staggerChildren: 0.05
+                }
+              }
+            }}
+          >
             {moodHistory.slice(0, 5).map((entry, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">
+              <motion.div 
+                key={index}
+                className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg"
+                variants={{
+                  hidden: { opacity: 0, x: -20 },
+                  show: { opacity: 1, x: 0 }
+                }}
+                whileHover={{ x: 5, scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex items-center space-x-4">
+                  <motion.span 
+                    className="text-3xl"
+                    whileHover={{ scale: 1.3, rotate: 15 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                     {entry.score >= 7 ? '😊' : entry.score >= 4 ? '😐' : '😔'}
-                  </span>
+                  </motion.span>
                   <div>
-                    <div className="font-semibold">Score: {entry.score}/10</div>
+                    <div className="font-semibold text-lg">Score: {entry.score}/10</div>
                     <div className="text-sm text-gray-600">
                       Emotions: {entry.emotions?.join(', ') || 'None recorded'}
                     </div>
                   </div>
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full">
                   {new Date(entry.created_at).toLocaleString()}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
-      {/* Debug Information */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-800 mb-2">🔧 Debug Information</h4>
+      {/* Enhanced Debug Information */}
+      <motion.div 
+        className="bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 1.0 }}
+      >
+        <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
+          <span className="mr-2">🔧</span>
+          System Debug Information
+        </h4>
         <div className="grid md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <p><strong>Backend Status:</strong> {backendStatus}</p>
+          <div className="space-y-2">
+            <p><strong>Backend Status:</strong> 
+              <motion.span 
+                className={`ml-2 px-2 py-1 rounded text-xs ${
+                  backendStatus === 'connected' ? 'bg-green-100 text-green-800' : 
+                  backendStatus === 'offline' ? 'bg-red-100 text-red-800' : 
+                  'bg-yellow-100 text-yellow-800'
+                }`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                {backendStatus}
+              </motion.span>
+            </p>
             <p><strong>Authentication:</strong> {isAuthenticated ? '✅ Logged in' : '❌ Not logged in'}</p>
-            <p><strong>Mood Entries:</strong> {moodHistory.length} found</p>
+            <p><strong>Mood Entries:</strong> <span className="text-blue-600 font-semibold">{moodHistory.length}</span> found</p>
             <p><strong>Analytics:</strong> {analytics ? '✅ Loaded' : '❌ Not loaded'}</p>
           </div>
-          <div>
+          <div className="space-y-2">
             <p><strong>Last Entry:</strong> {lastMoodEntry ? new Date(lastMoodEntry.created_at).toLocaleString() : 'None'}</p>
             <p><strong>Real Analysis:</strong> {realtimeAnalysis ? '✅ Available' : '❌ No data'}</p>
-            <p><strong>AI Insights Count:</strong> {getAIInsights().length}</p>
-            <p><strong>Data Source:</strong> {backendStatus === 'connected' ? 'Live Backend' : 'Mock/Offline'}</p>
+            <p><strong>AI Insights Count:</strong> <span className="text-purple-600 font-semibold">{getAIInsights().length}</span></p>
+            <p><strong>Data Source:</strong> 
+              <motion.span 
+                className={`ml-2 px-2 py-1 rounded text-xs ${
+                  backendStatus === 'connected' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1.4 }}
+              >
+                {backendStatus === 'connected' ? 'Live Backend' : 'Mock/Offline'}
+              </motion.span>
+            </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

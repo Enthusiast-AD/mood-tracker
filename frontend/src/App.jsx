@@ -8,6 +8,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import OfflineStatus from './components/OfflineStatus'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import ServiceWorkerUpdate from './components/ServiceWorkerUpdate'
+import PageTransition from './components/animations/PageTransition'
+import EnhancedToaster from './components/ui/EnhancedToast'
+import FloatingActionButton from './components/ui/FloatingActionButton'
 
 // Pages
 import HomePage from './pages/HomePage'
@@ -35,39 +38,45 @@ function App() {
               <Navigation />
               
               <main className="container mx-auto px-4 py-8">
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/auth/login" element={<LoginPage />} />
-                  <Route path="/auth/register" element={<RegisterPage />} />
-                  <Route path="/crisis-support" element={<CrisisSupport />} />
-                  
-                  {/* Protected Routes */}
-                  <Route 
-                    path="/mood-check" 
-                    element={
-                      <ProtectedRoute>
-                        <MoodCheck />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/settings/pwa" 
-                    element={
-                      <ProtectedRoute>
-                        <PWASettings />
-                      </ProtectedRoute>
-                    } 
-                  />
-                </Routes>
+                <PageTransition>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/auth/login" element={<LoginPage />} />
+                    <Route path="/auth/register" element={<RegisterPage />} />
+                    <Route path="/crisis-support" element={<CrisisSupport />} />
+                    
+                    {/* Protected Routes */}
+                    <Route 
+                      path="/mood-check" 
+                      element={
+                        <ProtectedRoute>
+                          <MoodCheck />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/dashboard" 
+                      element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/settings/pwa" 
+                      element={
+                        <ProtectedRoute>
+                          <PWASettings />
+                        </ProtectedRoute>
+                      } 
+                    />
+                  </Routes>
+                </PageTransition>
               </main>
+              
+              {/* Enhanced UI Components */}
+              <FloatingActionButton />
+              <EnhancedToaster />
               
               {/* PWA Install Prompt */}
               <PWAInstallPrompt />

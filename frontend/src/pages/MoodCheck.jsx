@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useToast } from '../components/ui/Toast'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
+import { showToast } from '../components/ui/EnhancedToast'
+import AnimatedButton from '../components/ui/AnimatedButton'
+import { MoodCheckSkeleton } from '../components/ui/LoadingStates'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function MoodCheck() {
+  const navigate = useNavigate()
   const [moodEntry, setMoodEntry] = useState({
     score: 5,
     emotions: [],
@@ -18,8 +23,10 @@ function MoodCheck() {
   const [recommendations, setRecommendations] = useState([])
   const [crisisAlert, setCrisisAlert] = useState(false)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-
-  const { toast } = useToast()
+  const [currentStep, setCurrentStep] = useState(1)
+  const [showCelebration, setShowCelebration] = useState(false)
+  const [showTips, setShowTips] = useState(true)
+  const [selectedEmotionDetails, setSelectedEmotionDetails] = useState(null)
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true)
@@ -35,22 +42,113 @@ function MoodCheck() {
   }, [])
 
   const emotions = [
-    { id: 'happy', label: 'Happy', emoji: '😊' },
-    { id: 'sad', label: 'Sad', emoji: '😢' },
-    { id: 'anxious', label: 'Anxious', emoji: '😰' },
-    { id: 'calm', label: 'Calm', emoji: '😌' },
-    { id: 'excited', label: 'Excited', emoji: '🤗' },
-    { id: 'angry', label: 'Angry', emoji: '😠' },
-    { id: 'tired', label: 'Tired', emoji: '😴' },
-    { id: 'stressed', label: 'Stressed', emoji: '😫' },
-    { id: 'confident', label: 'Confident', emoji: '💪' },
-    { id: 'lonely', label: 'Lonely', emoji: '😔' }
+    { 
+      id: 'happy', 
+      label: 'Happy', 
+      emoji: '😊', 
+      color: 'from-yellow-400 to-orange-400',
+      description: 'Feeling joyful and content',
+      tips: ['Share this positivity with others', 'Take note of what made you happy']
+    },
+    { 
+      id: 'sad', 
+      label: 'Sad', 
+      emoji: '😢', 
+      color: 'from-blue-400 to-blue-600',
+      description: 'Feeling down or melancholy',
+      tips: ['Allow yourself to feel this emotion', 'Consider talking to someone you trust']
+    },
+    { 
+      id: 'anxious', 
+      label: 'Anxious', 
+      emoji: '😰', 
+      color: 'from-purple-400 to-pink-400',
+      description: 'Feeling worried or nervous',
+      tips: ['Try deep breathing exercises', 'Focus on what you can control']
+    },
+    { 
+      id: 'calm', 
+      label: 'Calm', 
+      emoji: '😌', 
+      color: 'from-green-400 to-teal-400',
+      description: 'Feeling peaceful and relaxed',
+      tips: ['Enjoy this peaceful moment', 'Practice mindfulness to maintain calm']
+    },
+    { 
+      id: 'excited', 
+      label: 'Excited', 
+      emoji: '🤗', 
+      color: 'from-red-400 to-pink-400',
+      description: 'Feeling enthusiastic and energetic',
+      tips: ['Channel this energy positively', 'Share your excitement with others']
+    },
+    { 
+      id: 'angry', 
+      label: 'Angry', 
+      emoji: '😠', 
+      color: 'from-red-500 to-red-700',
+      description: 'Feeling frustrated or mad',
+      tips: ['Take deep breaths before reacting', 'Identify what triggered this feeling']
+    },
+    { 
+      id: 'tired', 
+      label: 'Tired', 
+      emoji: '😴', 
+      color: 'from-gray-400 to-gray-600',
+      description: 'Feeling exhausted or drained',
+      tips: ['Consider getting more rest', 'Take breaks when needed']
+    },
+    { 
+      id: 'stressed', 
+      label: 'Stressed', 
+      emoji: '😫', 
+      color: 'from-orange-400 to-red-400',
+      description: 'Feeling overwhelmed or pressured',
+      tips: ['Break tasks into smaller steps', 'Practice stress-relief techniques']
+    },
+    { 
+      id: 'confident', 
+      label: 'Confident', 
+      emoji: '💪', 
+      color: 'from-indigo-400 to-purple-400',
+      description: 'Feeling self-assured and capable',
+      tips: ['Use this confidence to tackle challenges', 'Remember this feeling for tough times']
+    },
+    { 
+      id: 'lonely', 
+      label: 'Lonely', 
+      emoji: '😔', 
+      color: 'from-blue-500 to-indigo-500',
+      description: 'Feeling isolated or disconnected',
+      tips: ['Reach out to friends or family', 'Consider joining social activities']
+    }
   ]
 
   const activities = [
-    'Work', 'Exercise', 'Socializing', 'Relaxing', 'Studying',
-    'Commuting', 'Sleeping', 'Eating', 'Entertainment', 'Other'
+    { value: 'work', label: '💼 Work', icon: '💼' },
+    { value: 'exercise', label: '🏃‍♀️ Exercise', icon: '🏃‍♀️' },
+    { value: 'socializing', label: '👥 Socializing', icon: '👥' },
+    { value: 'relaxing', label: '🧘‍♀️ Relaxing', icon: '🧘‍♀️' },
+    { value: 'studying', label: '📚 Studying', icon: '📚' },
+    { value: 'commuting', label: '🚗 Commuting', icon: '🚗' },
+    { value: 'sleeping', label: '😴 Sleeping', icon: '😴' },
+    { value: 'eating', label: '🍽️ Eating', icon: '🍽️' },
+    { value: 'entertainment', label: '🎬 Entertainment', icon: '🎬' },
+    { value: 'other', label: '🌟 Other', icon: '🌟' }
   ]
+
+  const moodDescriptions = {
+    1: { text: "Really struggling", color: "text-red-700", bg: "bg-red-100" },
+    2: { text: "Having a tough time", color: "text-red-600", bg: "bg-red-50" },
+    3: { text: "Feeling low", color: "text-orange-600", bg: "bg-orange-50" },
+    4: { text: "Not great", color: "text-yellow-600", bg: "bg-yellow-50" },
+    5: { text: "Okay, neutral", color: "text-gray-600", bg: "bg-gray-50" },
+    6: { text: "Pretty good", color: "text-blue-600", bg: "bg-blue-50" },
+    7: { text: "Feeling good", color: "text-green-600", bg: "bg-green-50" },
+    8: { text: "Really good", color: "text-green-700", bg: "bg-green-100" },
+    9: { text: "Amazing!", color: "text-emerald-700", bg: "bg-emerald-100" },
+    10: { text: "Absolutely fantastic!", color: "text-emerald-800", bg: "bg-emerald-200" }
+  }
 
   const handleEmotionToggle = (emotionId) => {
     setMoodEntry(prev => ({
@@ -59,6 +157,11 @@ function MoodCheck() {
         ? prev.emotions.filter(id => id !== emotionId)
         : [...prev.emotions, emotionId]
     }))
+    
+    // Show emotion details
+    const emotion = emotions.find(e => e.id === emotionId)
+    setSelectedEmotionDetails(emotion)
+    setTimeout(() => setSelectedEmotionDetails(null), 3000)
   }
 
   const saveToLocalStorage = (moodData) => {
@@ -73,7 +176,6 @@ function MoodCheck() {
 
   const generateMockAnalysis = (moodData) => {
     const score = moodData.score
-
     return {
       sentiment: score >= 6 ? 'positive' : score <= 4 ? 'negative' : 'neutral',
       sentiment_confidence: 0.85,
@@ -88,23 +190,34 @@ function MoodCheck() {
   }
 
   const generateMockRecommendations = (score) => {
-    if (score >= 7) {
+    if (score >= 8) {
       return [
-        '🎉 Great mood! Keep doing what you\'re doing',
-        '✨ Share your positive energy with others',
-        '📝 Consider journaling about what made today good'
+        '🎉 You\'re doing amazing! Keep up whatever you\'re doing',
+        '✨ Share your positive energy - it can inspire others',
+        '📝 Consider journaling about what made today special',
+        '🌟 Use this good mood to tackle something you\'ve been putting off'
+      ]
+    } else if (score >= 6) {
+      return [
+        '😊 You\'re in a good space - that\'s wonderful!',
+        '🚶‍♀️ A gentle walk might help maintain this positive feeling',
+        '💝 Do something kind for yourself or others',
+        '📱 Connect with someone who makes you smile'
       ]
     } else if (score >= 4) {
       return [
-        '🚶‍♀️ Take a short walk outside',
+        '🤗 It\'s okay to have neutral days - you\'re doing fine',
         '🧘‍♀️ Try a 5-minute breathing exercise',
-        '💬 Connect with a friend or family member'
+        '💬 Consider talking to a friend or family member',
+        '🎵 Listen to music that usually lifts your spirits'
       ]
     } else {
       return [
-        '🤗 Remember that difficult feelings are temporary',
+        '💙 Remember that difficult feelings are temporary',
         '📞 Consider reaching out to someone you trust',
-        '🏥 If you need immediate help, call 988'
+        '🛁 Try a small self-care activity like a warm bath',
+        '🏥 If you need immediate help, call 988 (Crisis Lifeline)',
+        '🤝 You don\'t have to go through this alone'
       ]
     }
   }
@@ -113,7 +226,8 @@ function MoodCheck() {
     e.preventDefault()
 
     if (moodEntry.emotions.length === 0) {
-      toast.warning('Please select at least one emotion')
+      showToast.warning('Please select at least one emotion to continue')
+      setCurrentStep(2) // Go back to emotions step
       return
     }
 
@@ -121,24 +235,21 @@ function MoodCheck() {
     setCrisisAlert(false)
 
     try {
-      // Get auth token
       const authToken = localStorage.getItem('authToken')
 
       if (!authToken) {
-        // Handle non-authenticated users with local analysis
         const mockAnalysis = generateMockAnalysis(moodEntry)
         const mockRecommendations = generateMockRecommendations(moodEntry.score)
 
         setAnalysis(mockAnalysis)
         setRecommendations(mockRecommendations)
-
         saveToLocalStorage(moodEntry)
-        toast.info('🤖 Mood analyzed locally (sign in for cloud sync)')
-        resetForm()
+        
+        showToast.mood('🤖 Mood analyzed locally - Sign in for AI cloud analysis!')
+        showCelebrationAndReset()
         return
       }
 
-      // Try the complete AI endpoint first
       let response = await fetch(`${API_BASE_URL}/api/mood/track-complete`, {
         method: 'POST',
         headers: {
@@ -148,7 +259,6 @@ function MoodCheck() {
         body: JSON.stringify(moodEntry)
       })
 
-      // If complete endpoint fails, try basic endpoint
       if (!response.ok && response.status === 404) {
         console.log('🔄 Trying basic mood tracking endpoint...')
         response = await fetch(`${API_BASE_URL}/api/mood/track`, {
@@ -164,7 +274,6 @@ function MoodCheck() {
       if (response.ok) {
         const result = await response.json()
 
-        // Handle different response formats
         if (result.complete_ai_analysis) {
           setAnalysis(result.complete_ai_analysis)
           setRecommendations(result.recommendations || [])
@@ -179,9 +288,8 @@ function MoodCheck() {
           setRecommendations(generateMockRecommendations(moodEntry.score))
         }
 
-        toast.success('🎉 Mood tracked successfully!')
-        resetForm()
-
+        showToast.success('🎉 Mood tracked successfully with AI analysis!')
+        showCelebrationAndReset()
       } else {
         throw new Error(`API error: ${response.status}`)
       }
@@ -189,26 +297,33 @@ function MoodCheck() {
     } catch (error) {
       console.error('Error submitting mood:', error)
 
-      // Always provide fallback analysis
       const mockAnalysis = generateMockAnalysis(moodEntry)
       const mockRecommendations = generateMockRecommendations(moodEntry.score)
 
       setAnalysis(mockAnalysis)
       setRecommendations(mockRecommendations)
-
       saveToLocalStorage(moodEntry)
 
       if (error.message.includes('404')) {
-        toast.info('🔄 Using local analysis (API endpoint not found)')
+        showToast.info('🔄 Using local analysis - API endpoint not found')
       } else {
-        toast.info('🔄 Using local analysis (connection issue)')
+        showToast.info('🔄 Using local analysis - connection issue')
       }
 
-      resetForm()
+      showCelebrationAndReset()
 
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const showCelebrationAndReset = () => {
+    setShowCelebration(true)
+    setTimeout(() => {
+      setShowCelebration(false)
+      setCurrentStep(1)
+      resetForm()
+    }, 4000)
   }
 
   const resetForm = () => {
@@ -230,267 +345,909 @@ function MoodCheck() {
     return '😢'
   }
 
-  const getMoodColor = () => {
-    if (moodEntry.score >= 7) return 'text-green-600'
-    if (moodEntry.score >= 5) return 'text-yellow-600'
-    if (moodEntry.score >= 3) return 'text-orange-600'
-    return 'text-red-600'
+  const stepVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -50 }
   }
 
-  // MAIN RENDER - Make sure this is returning JSX
+  const progressPercentage = (currentStep / 4) * 100
+
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      {/* Test if component is rendering */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          🧠 Mood Check Test
-        </h1>
-        <p className="text-gray-600">
-          If you can see this, the component is loading correctly!
-        </p>
-      </div>
-
-      {/* Offline Status */}
-      {!isOnline && (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
-          📱 You're offline. Mood data will be saved locally and synced when connection is restored.
-        </div>
-      )}
-
-      {/* Crisis Alert */}
-      {crisisAlert && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-          <h3 className="font-bold">🆘 Crisis Support Available</h3>
-          <p>Based on your mood entry, we want to make sure you have immediate support:</p>
-          <div className="mt-2">
-            <button
-              onClick={() => window.open('tel:988')}
-              className="bg-red-600 text-white px-4 py-2 rounded mr-2 hover:bg-red-700 transition-colors"
-            >
-              Call 988 (Crisis Lifeline)
-            </button>
-            <button
-              onClick={() => setCrisisAlert(false)}
-              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-            >
-              I'm Safe
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center mb-8">
-          How are you feeling today? {getMoodEmoji()}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Mood Slider */}
-          <div>
-            <label className="block text-lg font-semibold mb-4">
-              Overall Mood: <span className={`text-2xl ${getMoodColor()}`}>
-                {moodEntry.score}/10 {getMoodEmoji()}
-              </span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="10"
-              value={moodEntry.score}
-              onChange={(e) => setMoodEntry(prev => ({ ...prev, score: parseInt(e.target.value) }))}
-              className="w-full h-3 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200 rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-sm text-gray-500 mt-2">
-              <span>😢 Very Low</span>
-              <span>😐 Neutral</span>
-              <span>😊 Very High</span>
-            </div>
-          </div>
-
-          {/* Emotion Selection */}
-          <div>
-            <label className="block text-lg font-semibold mb-4">
-              Select emotions you're experiencing:
-              <span className="text-sm text-gray-500 ml-2">
-                ({moodEntry.emotions.length} selected)
-              </span>
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {emotions.map(emotion => (
-                <button
-                  key={emotion.id}
-                  type="button"
-                  onClick={() => handleEmotionToggle(emotion.id)}
-                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${moodEntry.emotions.includes(emotion.id)
-                      ? 'border-blue-500 bg-blue-50 shadow-md scale-105'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                >
-                  <div className="text-2xl mb-1">{emotion.emoji}</div>
-                  <div className="text-sm font-medium">{emotion.label}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Context Information */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-lg font-semibold mb-2">
-                Current Activity (optional):
-              </label>
-              <select
-                value={moodEntry.activity}
-                onChange={(e) => setMoodEntry(prev => ({ ...prev, activity: e.target.value }))}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select an activity</option>
-                {activities.map(act => (
-                  <option key={act} value={act}>{act}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-lg font-semibold mb-2">
-                Location (optional):
-              </label>
-              <input
-                type="text"
-                value={moodEntry.location}
-                onChange={(e) => setMoodEntry(prev => ({ ...prev, location: e.target.value }))}
-                placeholder="e.g., Home, Office, Park"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-lg font-semibold mb-4">
-              What's on your mind? (optional):
-            </label>
-            <textarea
-              value={moodEntry.notes}
-              onChange={(e) => setMoodEntry(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="Share what's happening, how you're feeling, or what might have influenced your mood..."
-              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              rows="4"
-              maxLength="2000"
-            />
-            <div className="text-sm text-gray-500 mt-1">
-              {moodEntry.notes.length}/2000 characters
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting || moodEntry.emotions.length === 0}
-            className={`w-full font-semibold py-4 px-6 rounded-lg transition-all duration-200 ${isSubmitting || moodEntry.emotions.length === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-              }`}
+    <motion.div 
+      className="max-w-5xl mx-auto py-8 px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Enhanced Celebration Animation */}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Analyzing your mood...
+            <motion.div
+              className="bg-white rounded-3xl p-8 text-center max-w-md mx-4 shadow-2xl"
+              initial={{ scale: 0.5, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.5, opacity: 0, y: 50 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <motion.div
+                className="text-8xl mb-6"
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  rotate: [0, 15, -15, 0]
+                }}
+                transition={{ 
+                  duration: 0.8,
+                  repeat: 2
+                }}
+              >
+                🎉
+              </motion.div>
+              
+              <motion.h2 
+                className="text-3xl font-bold text-gray-800 mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Mood Tracked Successfully!
+              </motion.h2>
+              
+              <motion.p 
+                className="text-gray-600 mb-6 text-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                Thank you for taking care of your mental health! 💙
+              </motion.p>
+              
+              <motion.div
+                className="flex flex-col space-y-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <AnimatedButton
+                  onClick={() => navigate('/dashboard')}
+                  variant="primary"
+                  size="lg"
+                  icon="📊"
+                >
+                  View Your Analytics
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={() => {
+                    setShowCelebration(false)
+                    setCurrentStep(1)
+                    resetForm()
+                  }}
+                  variant="outline"
+                  icon="➕"
+                >
+                  Track Another Mood
+                </AnimatedButton>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Enhanced Header */}
+      <motion.div 
+        className="text-center mb-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <motion.h1 
+          className="text-5xl font-bold text-gray-900 mb-4"
+          animate={{ 
+            scale: [1, 1.02, 1]
+          }}
+          transition={{ 
+            duration: 3,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+        >
+          🧠 How are you feeling today?
+        </motion.h1>
+        
+        <motion.p 
+          className="text-gray-600 text-xl mb-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          Let's track your mood with AI-powered insights and personalized recommendations
+        </motion.p>
+
+        {/* Enhanced Progress Bar */}
+        <motion.div 
+          className="mt-8 bg-white rounded-full h-4 max-w-lg mx-auto shadow-inner border-2 border-blue-100"
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+        >
+          <motion.div
+            className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full rounded-full flex items-center justify-end pr-2"
+            initial={{ width: "0%" }}
+            animate={{ width: `${progressPercentage}%` }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.span 
+              className="text-white text-xs font-bold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: progressPercentage > 15 ? 1 : 0 }}
+            >
+              {Math.round(progressPercentage)}%
+            </motion.span>
+          </motion.div>
+        </motion.div>
+        
+        <motion.p 
+          className="text-sm text-gray-500 mt-3 font-medium"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          Step {currentStep} of 4 • {progressPercentage === 100 ? 'Ready to submit!' : 'Keep going!'}
+        </motion.p>
+      </motion.div>
+
+      {/* Enhanced Offline Status */}
+      <AnimatePresence>
+        {!isOnline && (
+          <motion.div
+            className="bg-gradient-to-r from-yellow-100 to-orange-100 border-l-4 border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg mb-6 shadow-md"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+          >
+            <div className="flex items-center">
+              <motion.span 
+                className="text-2xl mr-3"
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                📱
+              </motion.span>
+              <div>
+                <p className="font-semibold">You're offline</p>
+                <p className="text-sm">Mood data will be saved locally and synced when connection is restored.</p>
               </div>
-            ) : (
-              `Track My Mood 🤖`
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Enhanced Crisis Alert */}
+      <AnimatePresence>
+        {crisisAlert && (
+          <motion.div
+            className="bg-gradient-to-r from-red-100 to-pink-100 border-l-4 border-red-400 text-red-800 px-6 py-4 rounded-lg mb-6 shadow-lg"
+            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+          >
+            <div className="flex items-start">
+              <motion.span 
+                className="text-3xl mr-4"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                🆘
+              </motion.span>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-2">Crisis Support Available</h3>
+                <p className="mb-4">Based on your mood entry, we want to make sure you have immediate support.</p>
+                <div className="flex flex-wrap gap-3">
+                  <AnimatedButton
+                    onClick={() => window.open('tel:988')}
+                    variant="danger"
+                    size="sm"
+                    icon="📞"
+                  >
+                    Call 988 (Crisis Lifeline)
+                  </AnimatedButton>
+                  <AnimatedButton
+                    onClick={() => window.open('sms:741741')}
+                    variant="danger"
+                    size="sm"
+                    icon="💬"
+                  >
+                    Text HOME to 741741
+                  </AnimatedButton>
+                  <AnimatedButton
+                    onClick={() => setCrisisAlert(false)}
+                    variant="outline"
+                    size="sm"
+                    icon="✅"
+                  >
+                    I'm Safe
+                  </AnimatedButton>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Form Container */}
+      <motion.div 
+        className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <AnimatePresence mode="wait">
+            {/* Step 1: Enhanced Mood Slider */}
+            {currentStep === 1 && (
+              <motion.div
+                key="step1"
+                variants={stepVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+              >
+                <div className="text-center">
+                  {/* Tips Section */}
+                  <AnimatePresence>
+                    {showTips && (
+                      <motion.div
+                        className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center">
+                            <span className="text-2xl mr-2">💡</span>
+                            <div className="text-left">
+                              <p className="font-semibold text-blue-800">Quick Tip</p>
+                              <p className="text-blue-700 text-sm">Rate your overall mood right now, not how you want to feel.</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowTips(false)}
+                            className="text-blue-400 hover:text-blue-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  
+                  <motion.div 
+                    className="text-9xl mb-8"
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ 
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    {getMoodEmoji()}
+                  </motion.div>
+                  
+                  <motion.div 
+                    className={`inline-block px-6 py-3 rounded-full mb-6 ${moodDescriptions[moodEntry.score].bg}`}
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <span className={`text-2xl font-bold ${moodDescriptions[moodEntry.score].color}`}>
+                      {moodEntry.score}/10 - {moodDescriptions[moodEntry.score].text}
+                    </span>
+                  </motion.div>
+                  
+                  <div className="px-4">
+                    <motion.input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={moodEntry.score}
+                      onChange={(e) => setMoodEntry(prev => ({ ...prev, score: parseInt(e.target.value) }))}
+                      className="w-full h-6 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200 rounded-full appearance-none cursor-pointer slider-enhanced"
+                      style={{
+                        background: `linear-gradient(to right, 
+                          #fca5a5 0%, #fcd34d 50%, #86efac 100%)`
+                      }}
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                    
+                    <div className="flex justify-between text-sm text-gray-600 mt-4 px-2">
+                      <span className="flex items-center">😢 <span className="ml-1 hidden sm:inline">Very Low</span></span>
+                      <span className="flex items-center">😐 <span className="ml-1 hidden sm:inline">Neutral</span></span>
+                      <span className="flex items-center">😊 <span className="ml-1 hidden sm:inline">Very High</span></span>
+                    </div>
+                  </div>
+
+                  <motion.div className="mt-10">
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(2)}
+                      variant="primary"
+                      size="lg"
+                      icon="➡️"
+                    >
+                      Continue to Emotions
+                    </AnimatedButton>
+                  </motion.div>
+                </div>
+              </motion.div>
             )}
-          </button>
+
+            {/* Step 2: Enhanced Emotion Selection */}
+            {currentStep === 2 && (
+              <motion.div
+                key="step2"
+                variants={stepVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+              >
+                <div>
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      What emotions are you experiencing?
+                    </h2>
+                    <p className="text-gray-600">Select all that apply - it's okay to feel multiple emotions</p>
+                    <motion.div 
+                      className="inline-block mt-4 px-4 py-2 bg-blue-100 rounded-full"
+                      animate={{ scale: moodEntry.emotions.length > 0 ? [1, 1.05, 1] : 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <span className="text-blue-800 font-semibold">
+                        {moodEntry.emotions.length} emotion{moodEntry.emotions.length !== 1 ? 's' : ''} selected
+                      </span>
+                    </motion.div>
+                  </div>
+                  
+                  <motion.div 
+                    className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: {},
+                      visible: {
+                        transition: {
+                          staggerChildren: 0.05
+                        }
+                      }
+                    }}
+                  >
+                    {emotions.map((emotion, index) => (
+                      <motion.button
+                        key={emotion.id}
+                        type="button"
+                        onClick={() => handleEmotionToggle(emotion.id)}
+                        className={`relative p-4 rounded-2xl border-3 transition-all duration-300 ${
+                          moodEntry.emotions.includes(emotion.id)
+                            ? `border-blue-500 bg-gradient-to-br ${emotion.color} text-white shadow-xl scale-105`
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 bg-white'
+                        }`}
+                        variants={{
+                          hidden: { opacity: 0, scale: 0.8, y: 20 },
+                          visible: { opacity: 1, scale: 1, y: 0 }
+                        }}
+                        whileHover={{ 
+                          scale: moodEntry.emotions.includes(emotion.id) ? 1.05 : 1.1,
+                          y: -5
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Selection indicator */}
+                        <AnimatePresence>
+                          {moodEntry.emotions.includes(emotion.id) && (
+                            <motion.div
+                              className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0, opacity: 0 }}
+                            >
+                              ✓
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <motion.div 
+                          className="text-4xl mb-3"
+                          animate={moodEntry.emotions.includes(emotion.id) ? {
+                            scale: [1, 1.3, 1],
+                            rotate: [0, 10, -10, 0]
+                          } : {}}
+                          transition={{ duration: 0.5 }}
+                        >
+                          {emotion.emoji}
+                        </motion.div>
+                        <div className="text-sm font-semibold">{emotion.label}</div>
+                        <div className="text-xs opacity-80 mt-1">{emotion.description}</div>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+
+                  {/* Emotion Details Popup */}
+                  <AnimatePresence>
+                    {selectedEmotionDetails && (
+                      <motion.div
+                        className="bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-200 rounded-xl p-4 mb-6"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                      >
+                        <div className="flex items-center mb-2">
+                          <span className="text-2xl mr-2">{selectedEmotionDetails.emoji}</span>
+                          <h3 className="font-bold text-purple-800">{selectedEmotionDetails.label}</h3>
+                        </div>
+                        <p className="text-purple-700 text-sm mb-2">{selectedEmotionDetails.description}</p>
+                        <div className="text-xs text-purple-600">
+                          <strong>Tips:</strong> {selectedEmotionDetails.tips.join(' • ')}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="flex justify-center space-x-4">
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(1)}
+                      variant="outline"
+                      icon="⬅️"
+                    >
+                      Back to Mood
+                    </AnimatedButton>
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      variant="primary"
+                      disabled={moodEntry.emotions.length === 0}
+                      icon="➡️"
+                    >
+                      {moodEntry.emotions.length === 0 ? 'Select at least one emotion' : 'Add Context'}
+                    </AnimatedButton>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Enhanced Context Information */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step3"
+                variants={stepVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+              >
+                <div className="space-y-8">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      Add some context
+                    </h2>
+                    <p className="text-gray-600">This helps our AI provide better insights (optional)</p>
+                  </div>
+
+                  {/* Enhanced Activity Selection */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <label className="block text-lg font-semibold mb-4 text-center">
+                      What are you doing right now?
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      {activities.map((activity, index) => (
+                        <motion.button
+                          key={activity.value}
+                          type="button"
+                          onClick={() => setMoodEntry(prev => ({ 
+                            ...prev, 
+                            activity: prev.activity === activity.value ? '' : activity.value 
+                          }))}
+                          className={`p-3 rounded-xl border-2 transition-all duration-200 ${
+                            moodEntry.activity === activity.value
+                              ? 'border-blue-500 bg-blue-50 text-blue-700 scale-105'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.05 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <div className="text-2xl mb-1">{activity.icon}</div>
+                          <div className="text-xs font-medium">{activity.label.split(' ')[1]}</div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Location Input */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <label className="block text-lg font-semibold mb-3 text-center">
+                      Where are you?
+                    </label>
+                    <motion.input
+                      type="text"
+                      value={moodEntry.location}
+                      onChange={(e) => setMoodEntry(prev => ({ ...prev, location: e.target.value }))}
+                      placeholder="e.g., Home, Office, Park, Coffee Shop..."
+                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all text-center text-lg"
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                  </motion.div>
+
+                  <div className="flex justify-center space-x-4">
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(2)}
+                      variant="outline"
+                      icon="⬅️"
+                    >
+                      Back to Emotions
+                    </AnimatedButton>
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(4)}
+                      variant="primary"
+                      icon="➡️"
+                    >
+                      Add Notes
+                    </AnimatedButton>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 4: Enhanced Notes */}
+            {currentStep === 4 && (
+              <motion.div
+                key="step4"
+                variants={stepVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ duration: 0.4 }}
+              >
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                      What's on your mind?
+                    </h2>
+                    <p className="text-gray-600">Share your thoughts for better AI insights (optional)</p>
+                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <motion.textarea
+                      value={moodEntry.notes}
+                      onChange={(e) => setMoodEntry(prev => ({ ...prev, notes: e.target.value }))}
+                      placeholder="What's happening in your life? What might be influencing your mood? How are you feeling about things? Share anything that feels relevant..."
+                      className="w-full p-6 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all resize-none text-lg leading-relaxed"
+                      rows="6"
+                      maxLength="2000"
+                      whileFocus={{ scale: 1.01 }}
+                    />
+                    
+                    <motion.div 
+                      className="flex justify-between items-center mt-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <span className="text-sm text-gray-500">
+                        💡 The more you share, the better our AI can help
+                      </span>
+                      <span className={`text-sm font-medium ${
+                        moodEntry.notes.length > 1800 ? 'text-red-500' : 
+                        moodEntry.notes.length > 1500 ? 'text-yellow-500' : 'text-gray-500'
+                      }`}>
+                        {moodEntry.notes.length}/2000
+                      </span>
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Summary Before Submit */}
+                  <motion.div
+                    className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <h3 className="font-bold text-green-800 mb-3 flex items-center">
+                      <span className="mr-2">📋</span>
+                      Your Mood Summary
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-semibold text-green-700">Mood Score:</span>
+                        <span className="ml-2">{moodEntry.score}/10 ({moodDescriptions[moodEntry.score].text})</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">Emotions:</span>
+                        <span className="ml-2">{moodEntry.emotions.join(', ') || 'None selected'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">Activity:</span>
+                        <span className="ml-2">{moodEntry.activity || 'Not specified'}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-green-700">Location:</span>
+                        <span className="ml-2">{moodEntry.location || 'Not specified'}</span>
+                      </div>
+                    </div>
+                    {moodEntry.notes && (
+                      <div className="mt-3 pt-3 border-t border-green-200">
+                        <span className="font-semibold text-green-700">Notes:</span>
+                        <p className="text-green-600 mt-1 text-sm italic">
+                          "{moodEntry.notes.substring(0, 100)}{moodEntry.notes.length > 100 ? '...' : ''}"
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+
+                  <div className="flex justify-center space-x-4">
+                    <AnimatedButton
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      variant="outline"
+                      icon="⬅️"
+                    >
+                      Back to Context
+                    </AnimatedButton>
+                    <AnimatedButton
+                      type="submit"
+                      variant="success"
+                      size="lg"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                      icon="🧠"
+                    >
+                      {isSubmitting ? 'Analyzing with AI...' : 'Track My Mood'}
+                    </AnimatedButton>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </form>
 
-        {/* Analysis Results */}
-        {analysis && (
-          <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="text-xl font-semibold mb-4">🔮 Mood Analysis Results</h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <div>
-                  <span className="font-semibold text-gray-700">Sentiment:</span>
-                  <span className={`ml-2 capitalize font-bold ${analysis.sentiment === 'positive' ? 'text-green-600' :
+        {/* Enhanced Analysis Results */}
+        <AnimatePresence>
+          {analysis && !showCelebration && (
+            <motion.div 
+              className="mt-12 p-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200 shadow-lg"
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.h3 
+                className="text-2xl font-bold mb-6 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <motion.span 
+                  className="mr-3 text-3xl"
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  🔮
+                </motion.span>
+                AI Analysis Results
+              </motion.h3>
+              
+              <motion.div 
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.1,
+                      delayChildren: 0.3
+                    }
+                  }
+                }}
+              >
+                {/* Sentiment */}
+                <motion.div 
+                  className="bg-white p-4 rounded-xl shadow-md"
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">😊</div>
+                    <div className="font-semibold text-gray-700 mb-1">Sentiment</div>
+                    <div className={`text-lg font-bold capitalize ${
+                      analysis.sentiment === 'positive' ? 'text-green-600' :
                       analysis.sentiment === 'negative' ? 'text-red-600' : 'text-blue-600'
                     }`}>
-                    {analysis.sentiment || 'Neutral'}
-                  </span>
-                </div>
+                      {analysis.sentiment || 'Neutral'}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {Math.round((analysis.sentiment_confidence || analysis.confidence || 0.7) * 100)}% confident
+                    </div>
+                  </div>
+                </motion.div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Energy Level:</span>
-                  <span className={`ml-2 capitalize font-bold ${analysis.energy_level === 'high' ? 'text-green-600' :
+                {/* Energy Level */}
+                <motion.div 
+                  className="bg-white p-4 rounded-xl shadow-md"
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">⚡</div>
+                    <div className="font-semibold text-gray-700 mb-1">Energy Level</div>
+                    <div className={`text-lg font-bold capitalize ${
+                      analysis.energy_level === 'high' ? 'text-green-600' :
                       analysis.energy_level === 'low' ? 'text-red-600' : 'text-yellow-600'
                     }`}>
-                    {analysis.energy_level || 'Moderate'}
-                  </span>
-                </div>
+                      {analysis.energy_level || 'Moderate'}
+                    </div>
+                  </div>
+                </motion.div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Risk Level:</span>
-                  <span className={`ml-2 capitalize font-bold ${analysis.risk_level === 'high' ? 'text-red-600' :
+                {/* Risk Assessment */}
+                <motion.div 
+                  className="bg-white p-4 rounded-xl shadow-md"
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 }
+                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">🛡️</div>
+                    <div className="font-semibold text-gray-700 mb-1">Risk Level</div>
+                    <div className={`text-lg font-bold capitalize ${
+                      analysis.risk_level === 'high' ? 'text-red-600' :
                       analysis.risk_level === 'medium' ? 'text-yellow-600' : 'text-green-600'
                     }`}>
-                    {analysis.risk_level || 'Low'}
-                  </span>
-                </div>
-              </div>
+                      {analysis.risk_level || 'Low'}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
 
-              <div className="space-y-3">
-                <div>
-                  <span className="font-semibold text-gray-700">Confidence:</span>
-                  <span className="ml-2 font-bold text-blue-600">
-                    {Math.round((analysis.sentiment_confidence || analysis.confidence || 0.7) * 100)}%
-                  </span>
-                </div>
+              {/* Risk Indicators */}
+              {analysis.risk_indicators && analysis.risk_indicators.length > 0 && (
+                <motion.div 
+                  className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <p className="font-semibold text-yellow-800 mb-2 flex items-center">
+                    <span className="mr-2">⚠️</span>
+                    Risk Indicators Detected
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+                    {analysis.risk_indicators.map((indicator, index) => (
+                      <motion.li 
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.7 + index * 0.1 }}
+                      >
+                        {indicator}
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Analysis Method:</span>
-                  <span className="ml-2 capitalize text-gray-600">
-                    {analysis.analysis_method?.replace('_', ' ') || 'AI Analysis'}
-                  </span>
-                </div>
+        {/* Enhanced Recommendations */}
+        <AnimatePresence>
+          {recommendations.length > 0 && !showCelebration && (
+            <motion.div 
+              className="mt-8 p-8 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl border border-green-200 shadow-lg"
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <motion.h3 
+                className="text-2xl font-bold mb-6 flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <motion.span 
+                  className="mr-3 text-3xl"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  💡
+                </motion.span>
+                Personalized Recommendations
+              </motion.h3>
+              
+              <motion.div 
+                className="grid gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.1,
+                      delayChildren: 0.7
+                    }
+                  }
+                }}
+              >
+                {recommendations.map((rec, index) => (
+                  <motion.div 
+                    key={index} 
+                    className="flex items-start bg-white p-4 rounded-xl shadow-md border border-green-100"
+                    variants={{
+                      hidden: { opacity: 0, x: -20 },
+                      visible: { opacity: 1, x: 0 }
+                    }}
+                    whileHover={{ x: 5, scale: 1.02 }}
+                  >
+                    <span className="text-green-600 mr-4 mt-1 text-lg">•</span>
+                    <span className="flex-1 text-gray-700">{rec}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
 
-                <div>
-                  <span className="font-semibold text-gray-700">Emotional Complexity:</span>
-                  <span className="ml-2 font-bold text-purple-600">
-                    {analysis.emotional_complexity || moodEntry.emotions.length}/10
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Risk Indicators */}
-            {analysis.risk_indicators && analysis.risk_indicators.length > 0 && (
-              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="font-semibold text-yellow-800 mb-2">⚠️ Risk Indicators:</p>
-                <ul className="list-disc list-inside text-sm text-yellow-700">
-                  {analysis.risk_indicators.map((indicator, index) => (
-                    <li key={index}>{indicator}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Recommendations */}
-        {recommendations.length > 0 && (
-          <div className="mt-6 p-6 bg-green-50 rounded-lg border border-green-200">
-            <h3 className="text-xl font-semibold mb-4">💡 Personalized Recommendations</h3>
-            <ul className="space-y-2">
-              {recommendations.map((rec, index) => (
-                <li key={index} className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  <span>{rec}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </div>
+              <motion.div 
+                className="flex justify-center mt-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.0 }}
+              >
+                <AnimatedButton
+                  onClick={() => navigate('/dashboard')}
+                  variant="success"
+                  size="lg"
+                  icon="📊"
+                >
+                  View Detailed Analytics
+                </AnimatedButton>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
   )
 }
 
