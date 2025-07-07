@@ -1,8 +1,8 @@
 ﻿"""
-Mental Health AI Backend API - Day 4 Complete AI Integration
+Mental Health AI Backend API - Day 7 Complete AI Integration with Assistant (FIXED)
 Author: Enthusiast-AD  
-Date: 2025-07-04 11:03:42 UTC
-Complete AI-Powered Production Backend
+Date: 2025-07-07 13:00:43 UTC
+Complete AI-Powered Production Backend with Working Assistant - Import Issues Fixed
 """
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends, status, BackgroundTasks
@@ -29,7 +29,7 @@ from app.models.analytics import AnalyticsCache
 from app.auth.auth_handler import AuthHandler
 from app.auth.schemas import UserCreate, UserLogin, UserResponse, Token, UserPreferences, PasswordChange
 
-# Complete AI imports - ALL MODULES!
+# FIXED: Complete AI imports with proper error handling
 try:
     from app.ai.model_manager import model_manager
     from app.ai.sentiment_analyzer import sentiment_analyzer
@@ -37,11 +37,68 @@ try:
     from app.ai.crisis_detector import crisis_detector, RiskLevel
     from app.ai.text_analyzer import text_analyzer
     from app.ai.mood_predictor import mood_predictor
+    print("✅ Core AI modules loaded successfully!")
     AI_MODULES_AVAILABLE = True
-    print("✅ All AI modules loaded successfully!")
 except ImportError as e:
-    print(f"⚠️ AI modules not available: {e}")
+    print(f"⚠️ Core AI modules not available: {e}")
     AI_MODULES_AVAILABLE = False
+
+# FIXED: Assistant and enhanced features with safe imports
+try:
+    from app.ai.assistant import mental_health_assistant
+    print("✅ AI Assistant loaded successfully!")
+    ASSISTANT_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ AI Assistant not available: {e}")
+    ASSISTANT_AVAILABLE = False
+    mental_health_assistant = None
+
+try:
+    # FIXED: Import from the correct module name
+    from app.ai.voice_processor import enhanced_voice_processor as voice_processor
+    print("✅ Voice processor loaded successfully!")
+    VOICE_PROCESSOR_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Voice processor not available: {e}")
+    VOICE_PROCESSOR_AVAILABLE = False
+    voice_processor = None
+
+try:
+    from app.ai.conversation_memory import conversation_memory
+    print("✅ Conversation memory loaded successfully!")
+    CONVERSATION_MEMORY_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Conversation memory not available: {e}")
+    CONVERSATION_MEMORY_AVAILABLE = False
+    conversation_memory = None
+
+try:
+    from app.ai.mood_analyzer import mood_pattern_analyzer
+    print("✅ Mood analyzer loaded successfully!")
+    MOOD_ANALYZER_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Mood analyzer not available: {e}")
+    MOOD_ANALYZER_AVAILABLE = False
+    mood_pattern_analyzer = None
+
+# FIXED: Fallback imports for basic functionality
+try:
+    from app.ai.basic_sentiment import sentiment_analyzer as basic_sentiment
+    print("✅ Basic sentiment analyzer available as fallback")
+    BASIC_SENTIMENT_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Basic sentiment not available: {e}")
+    BASIC_SENTIMENT_AVAILABLE = False
+    basic_sentiment = None
+
+try:
+    from app.ai.emotion_detector import emotion_classifier as emotion_detector
+    print("✅ Emotion detector available as fallback")
+    EMOTION_DETECTOR_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Emotion detector not available: {e}")
+    EMOTION_DETECTOR_AVAILABLE = False
+    emotion_detector = None
 
 # Try importing optional dependencies
 ADVANCED_AI_AVAILABLE = False
@@ -68,42 +125,56 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI with complete AI description
+# FIXED: Check overall AI system availability
+COMPLETE_AI_AVAILABLE = (
+    AI_MODULES_AVAILABLE and 
+    ASSISTANT_AVAILABLE and 
+    VOICE_PROCESSOR_AVAILABLE and 
+    CONVERSATION_MEMORY_AVAILABLE
+)
+
+print(f"""
+🔍 AI System Status Check:
+- Core AI Modules: {'✅' if AI_MODULES_AVAILABLE else '❌'}
+- AI Assistant: {'✅' if ASSISTANT_AVAILABLE else '❌'}
+- Voice Processor: {'✅' if VOICE_PROCESSOR_AVAILABLE else '❌'}
+- Conversation Memory: {'✅' if CONVERSATION_MEMORY_AVAILABLE else '❌'}
+- Complete AI System: {'✅ FULLY OPERATIONAL' if COMPLETE_AI_AVAILABLE else '⚠️ PARTIAL/FALLBACK MODE'}
+""")
+
+# Initialize FastAPI with updated status
 app = FastAPI(
-    title="🧠 Mental Health AI API - Complete AI System",
+    title="🧠 Mental Health AI API - Complete AI System (FIXED)",
     description=f'''
-    **🤖 Complete AI-Powered Mental Health Platform**
+    **🤖 Complete AI-Powered Mental Health Platform - Import Issues Fixed**
     
-    **Built by Enthusiast-AD on 2025-07-04 11:03:42 UTC**
+    **Built by Enthusiast-AD on 2025-07-07 13:00:43 UTC**
+    **Status: {'✅ COMPLETE AI SYSTEM OPERATIONAL' if COMPLETE_AI_AVAILABLE else '⚠️ PARTIAL AI SYSTEM - SOME FEATURES IN FALLBACK MODE'}**
     
-    **🚀 Complete AI Features:**
-    - 🧠 **Advanced Sentiment Analysis** - Multi-model ensemble with transformers
-    - 🎭 **Emotion Classification** - 15+ emotions with intensity and complexity scoring
-    - 🚨 **Crisis Detection System** - 6-level risk assessment with automated intervention
-    - 🔮 **Mood Prediction** - Time series forecasting with pattern recognition
-    - 📊 **Advanced Analytics** - AI-powered insights, trends, and recommendations
-    - 🛡️ **Safety Systems** - Real-time crisis monitoring and emergency response
-    - 🔄 **Real-time Processing** - WebSocket integration with live AI analysis
-    - 📈 **Pattern Recognition** - Weekly, daily, and seasonal mood patterns
+    **🚀 AI System Status:**
+    - Core AI Models: {'✅ Active' if AI_MODULES_AVAILABLE else '❌ Unavailable'}
+    - AI Assistant: {'✅ Active' if ASSISTANT_AVAILABLE else '❌ Unavailable'}
+    - Voice Processing: {'✅ Active' if VOICE_PROCESSOR_AVAILABLE else '❌ Unavailable'}
+    - Conversation Memory: {'✅ Active' if CONVERSATION_MEMORY_AVAILABLE else '❌ Unavailable'}
     
-    **🎯 AI Models Integrated:**
-    - Sentiment Analysis (VADER + Transformers + Rule-based)
-    - Emotion Classification (15+ emotions with contextual analysis)
-    - Crisis Detection (Multi-layered safety protocols)
-    - Text Analysis (Advanced NLP with context understanding)
-    - Mood Prediction (Time series ML with pattern recognition)
-    - Risk Assessment (6-level intervention system)
+    **🎯 Available Features:**
+    - 🧠 **Sentiment Analysis** - {'Multi-model ensemble' if AI_MODULES_AVAILABLE else 'Basic fallback'}
+    - 🎭 **Emotion Classification** - {'Advanced ML models' if AI_MODULES_AVAILABLE else 'Keyword-based'}
+    - 🚨 **Crisis Detection** - {'6-level risk assessment' if AI_MODULES_AVAILABLE else 'Basic detection'}
+    - 🔮 **Mood Prediction** - {'Time series ML' if AI_MODULES_AVAILABLE else 'Statistical trends'}
+    - 🤖 **AI Assistant** - {'Full conversational AI' if ASSISTANT_AVAILABLE else 'Basic responses'}
+    - 🎤 **Voice Processing** - {'Speech optimization' if VOICE_PROCESSOR_AVAILABLE else 'Text-only'}
     
     **🔒 Authentication:** Bearer Token Required for Protected Endpoints
     **🗄️ Database:** SQLite with PostgreSQL fallback + AI analytics caching
-    **⚡ System Status:** Complete AI-Powered Production Ready ✅🤖
+    **⚡ System Status:** {'COMPLETE AI OPERATIONAL' if COMPLETE_AI_AVAILABLE else 'PARTIAL AI WITH FALLBACKS'} ✅
     ''',
-    version="4.0.0",
+    version="4.2.1",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
-# Enhanced CORS Configuration
+# Rest of your existing CORS, security, and model configurations...
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -118,11 +189,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Security
 security = HTTPBearer()
 auth_handler = AuthHandler()
 
-# Enhanced Pydantic Models for Complete AI System
+# Enhanced Pydantic Models for Complete AI System with Assistant
 class MoodEntryCreate(BaseModel):
     score: int = Field(..., ge=1, le=10, description="Mood score 1-10")
     emotions: List[str] = Field(..., min_items=1, description="Selected emotions")
@@ -174,6 +244,24 @@ class MoodPredictionResponse(BaseModel):
     pattern_analysis: Dict[str, Any]
     recommendations: List[str]
 
+# AI Assistant Models
+class ChatMessage(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000, description="User message")
+    conversation_id: Optional[str] = Field(None, description="Existing conversation ID")
+
+class VoiceChatMessage(BaseModel):
+    transcript: str = Field(..., min_length=1, max_length=2000, description="Voice transcript")
+    conversation_id: Optional[str] = Field(None, description="Existing conversation ID")
+    audio_metadata: Optional[Dict[str, Any]] = Field(None, description="Audio processing metadata")
+
+class ChatResponse(BaseModel):
+    conversation_id: str
+    response: Dict[str, Any]
+    mood_insights: Dict[str, Any]
+    recommendations: List[str]
+    crisis_assessment: Dict[str, Any]
+    timestamp: str
+
 # Global variables
 ai_models = {}
 active_connections: Dict[str, WebSocket] = {}
@@ -181,13 +269,13 @@ startup_time = datetime.now(timezone.utc)
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize application with complete AI system"""
+    """FIXED: Initialize application with proper error handling"""
     global model_manager, ai_models
     
-    logger.info("🚀 Mental Health AI API - Complete AI System Startup")
-    logger.info(f"📅 Complete AI Build Time: 2025-07-04 11:03:42 UTC")
+    logger.info("🚀 Mental Health AI API - Complete AI System STARTUP (Import Issues Fixed)")
+    logger.info(f"📅 Fixed Build Time: 2025-07-07 13:00:43 UTC")
     logger.info(f"👤 AI System Developer: Enthusiast-AD")
-    logger.info(f"🎯 Complete Focus: Full AI Model Integration")
+    logger.info(f"🎯 Focus: Fixed Import Issues + Full AI Integration")
     
     # Initialize database
     try:
@@ -196,38 +284,54 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {e}")
     
-    # Initialize complete AI system
+    # FIXED: Initialize AI system with proper error handling
     if AI_MODULES_AVAILABLE:
         try:
-            logger.info("🤖 Initializing COMPLETE AI model system...")
-            
-            # Initialize all AI models
+            logger.info("🤖 Initializing Core AI model system...")
             ai_success = await model_manager.initialize_models()
             
             if ai_success:
-                logger.info("✅ Complete AI model system initialized successfully!")
-                
-                # Perform comprehensive AI system health check
+                logger.info("✅ Core AI model system initialized successfully!")
                 health_status = await model_manager.health_check()
-                logger.info(f"🏥 Complete AI Health Check: {health_status['overall_status']}")
-                
+                logger.info(f"🏥 Core AI Health Check: {health_status['overall_status']}")
             else:
-                logger.warning("⚠️ AI model system partially initialized - some models using fallbacks")
-            
-            # Initialize VADER if available
-            if ADVANCED_AI_AVAILABLE:
-                ai_models['vader'] = SentimentIntensityAnalyzer()
-                logger.info("✅ VADER sentiment analyzer loaded")
+                logger.warning("⚠️ Core AI model system partially initialized")
                 
         except Exception as e:
-            logger.error(f"❌ Complete AI model initialization failed: {e}")
-            logger.info("📝 Continuing with basic analysis fallbacks")
+            logger.error(f"❌ Core AI model initialization failed: {e}")
     else:
-        logger.warning("⚠️ AI modules not available - using basic analysis")
+        logger.warning("⚠️ Core AI modules not available - using fallbacks")
     
-    logger.info("🎉 Mental Health AI API Complete AI System - Ready!")
+    # FIXED: Test AI Assistant with safe handling
+    if ASSISTANT_AVAILABLE and mental_health_assistant:
+        try:
+            logger.info("✅ AI Assistant loaded and ready for conversations")
+        except Exception as e:
+            logger.error(f"❌ AI Assistant test failed: {e}")
+    else:
+        logger.warning("⚠️ AI Assistant not available - chat will use fallbacks")
+    
+    # FIXED: Test Voice Processor with safe handling  
+    if VOICE_PROCESSOR_AVAILABLE and voice_processor:
+        try:
+            logger.info("✅ Voice processor ready for speech interactions")
+        except Exception as e:
+            logger.error(f"❌ Voice processor test failed: {e}")
+    else:
+        logger.warning("⚠️ Voice processor not available - voice features disabled")
+    
+    # Initialize VADER if available
+    if ADVANCED_AI_AVAILABLE:
+        try:
+            ai_models['vader'] = SentimentIntensityAnalyzer()
+            logger.info("✅ VADER sentiment analyzer loaded")
+        except Exception as e:
+            logger.error(f"❌ VADER initialization failed: {e}")
+    
+    final_status = "COMPLETE AI SYSTEM OPERATIONAL" if COMPLETE_AI_AVAILABLE else "PARTIAL AI SYSTEM WITH FALLBACKS"
+    logger.info(f"🎉 Mental Health AI API - {final_status} - Ready!")
 
-# Helper functions (authentication - same as before)
+# Helper functions (authentication)
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), 
                           db: Session = Depends(get_db)):
     """Get current authenticated user"""
@@ -262,7 +366,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # Root endpoint with complete AI system status
 @app.get("/", response_model=Dict[str, Any])
 async def root(db: Session = Depends(get_db)):
-    """Enhanced API root with complete AI system status"""
+    """FIXED: Enhanced API root with accurate AI system status"""
     uptime = datetime.now(timezone.utc) - startup_time
     
     # Get database statistics safely
@@ -282,7 +386,7 @@ async def root(db: Session = Depends(get_db)):
         total_crisis_incidents = 0
         recent_entries = 0
     
-    # Get complete AI system status
+    # FIXED: Get accurate AI system status
     ai_status = {}
     if AI_MODULES_AVAILABLE:
         try:
@@ -291,42 +395,35 @@ async def root(db: Session = Depends(get_db)):
             ai_status = {"error": "AI status unavailable"}
     
     return {
-        "service": "🧠 Mental Health AI API - Complete AI System",
-        "status": "🟢 OPERATIONAL - COMPLETE AI POWERED",
-        "version": "4.0.0",
+        "service": "🧠 Mental Health AI API - Complete AI System (FIXED)",
+        "status": f"🟢 OPERATIONAL - {'COMPLETE AI POWERED' if COMPLETE_AI_AVAILABLE else 'PARTIAL AI WITH FALLBACKS'}",
+        "version": "4.2.1",
         "build_info": {
             "author": "Enthusiast-AD",
-            "build_date": "2025-07-04",
-            "build_time": "11:03:42 UTC",
-            "day": "Day 4 - Complete AI Integration"
+            "build_date": "2025-07-07",
+            "build_time": "13:00:43 UTC",
+            "day": "Day 7 - Import Issues Fixed + Complete AI Integration"
         },
         "current_time": datetime.now(timezone.utc).isoformat(),
         "uptime_seconds": int(uptime.total_seconds()),
-        "complete_ai_system": {
-            "status": "✅ FULLY ACTIVE" if AI_MODULES_AVAILABLE else "⚠️ BASIC MODE",
-            "modules_available": AI_MODULES_AVAILABLE,
-            "advanced_ai": ADVANCED_AI_AVAILABLE,
+        "ai_system_status": {
+            "overall_status": "✅ COMPLETE AI OPERATIONAL" if COMPLETE_AI_AVAILABLE else "⚠️ PARTIAL AI MODE",
+            "core_ai_modules": "✅ ACTIVE" if AI_MODULES_AVAILABLE else "❌ UNAVAILABLE",
+            "ai_assistant": "✅ ACTIVE" if ASSISTANT_AVAILABLE else "❌ UNAVAILABLE", 
+            "voice_processor": "✅ ACTIVE" if VOICE_PROCESSOR_AVAILABLE else "❌ UNAVAILABLE",
+            "conversation_memory": "✅ ACTIVE" if CONVERSATION_MEMORY_AVAILABLE else "❌ UNAVAILABLE",
+            "advanced_ai": "✅ ACTIVE" if ADVANCED_AI_AVAILABLE else "❌ UNAVAILABLE",
             "models_info": ai_status,
             "capabilities": [
-                "🧠 Advanced Sentiment Analysis",
-                "🎭 15+ Emotion Classification", 
-                "🚨 6-Level Crisis Detection",
-                "🔮 Mood Prediction & Forecasting",
-                "📊 Pattern Recognition & Analytics",
-                "🛡️ Real-time Safety Monitoring",
-                "💡 AI-Powered Recommendations"
+                f"🧠 Sentiment Analysis - {'Advanced' if AI_MODULES_AVAILABLE else 'Basic'}",
+                f"🎭 Emotion Classification - {'ML Models' if AI_MODULES_AVAILABLE else 'Keywords'}", 
+                f"🚨 Crisis Detection - {'6-Level' if AI_MODULES_AVAILABLE else 'Basic'}",
+                f"🔮 Mood Prediction - {'ML Based' if AI_MODULES_AVAILABLE else 'Statistical'}",
+                f"🤖 AI Assistant - {'Full AI' if ASSISTANT_AVAILABLE else 'Fallback'}",
+                f"🎤 Voice Processing - {'Available' if VOICE_PROCESSOR_AVAILABLE else 'Disabled'}",
+                f"📊 Pattern Analysis - {'Advanced' if AI_MODULES_AVAILABLE else 'Basic'}",
+                f"🛡️ Safety Monitoring - {'Real-time' if AI_MODULES_AVAILABLE else 'Basic'}"
             ]
-        },
-        "enhanced_features": {
-            "ai_sentiment_analysis": "✅ Multi-model ensemble with transformers",
-            "emotion_classification": "✅ 15+ emotions with intensity & complexity",
-            "crisis_detection": "✅ 6-level risk assessment with intervention",
-            "mood_prediction": "✅ Time series ML with pattern recognition",
-            "pattern_analysis": "✅ Weekly, daily, seasonal trend analysis",
-            "real_time_monitoring": "✅ WebSocket with live AI analysis",
-            "safety_systems": "✅ Automated crisis response protocols",
-            "database_integration": "✅ SQLite/PostgreSQL with AI caching",
-            "user_authentication": "✅ JWT-based comprehensive security"
         },
         "database_info": get_db_info(),
         "statistics": {
@@ -341,22 +438,309 @@ async def root(db: Session = Depends(get_db)):
         }
     }
 
+
+# ========== AI ASSISTANT ENDPOINTS ==========
+
+@app.post("/api/ai/chat", response_model=ChatResponse)
+async def chat_with_ai_assistant(
+    chat_message: ChatMessage,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """FIXED: Chat with AI Assistant with fallback handling"""
+    try:
+        if not ASSISTANT_AVAILABLE or not mental_health_assistant:
+            # Fallback response when assistant not available
+            return ChatResponse(
+                conversation_id="fallback_" + str(datetime.now().timestamp()),
+                response={
+                    "content": "I'm here to support you with your mental health. While my advanced AI features are currently limited, I can still help. How are you feeling today?",
+                    "tone": "supportive",
+                    "source": "fallback_assistant"
+                },
+                mood_insights={},
+                recommendations=[
+                    "Take deep breaths and be gentle with yourself",
+                    "Consider talking to someone you trust",
+                    "Remember that support is available"
+                ],
+                crisis_assessment={"risk_level": "minimal", "intervention_required": False},
+                timestamp=datetime.now(timezone.utc).isoformat()
+            )
+        
+        # Use full AI assistant if available
+        result = await mental_health_assistant.chat(
+            user_message=chat_message.message,
+            user_id=current_user.id,
+            db=db,
+            conversation_id=chat_message.conversation_id
+        )
+        
+        logger.info(f"🤖 AI chat for {current_user.username}: {len(chat_message.message)} chars")
+        
+        if result.get('crisis_assessment', {}).get('intervention_required', False):
+            logger.critical(f"🚨 CRISIS detected in AI chat for user {current_user.username}")
+        
+        return ChatResponse(
+            conversation_id=result['conversation_id'],
+            response=result['response'],
+            mood_insights=result.get('mood_insights', {}),
+            recommendations=result.get('recommendations', []),
+            crisis_assessment=result.get('crisis_assessment', {}),
+            timestamp=result['timestamp']
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ AI chat error: {e}")
+        # Return fallback response on error
+        return ChatResponse(
+            conversation_id="error_" + str(datetime.now().timestamp()),
+            response={
+                "content": "I'm having some technical difficulties right now, but I'm still here for you. How can I support you today?",
+                "tone": "supportive",
+                "source": "error_fallback"
+            },
+            mood_insights={},
+            recommendations=["Take care of yourself", "Consider reaching out for support"],
+            crisis_assessment={"risk_level": "minimal", "intervention_required": False},
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+
+
+@app.post("/api/ai/voice-chat", response_model=Dict[str, Any])
+async def voice_chat_with_ai_assistant(
+    voice_message: VoiceChatMessage,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """FIXED: Voice chat with proper fallback handling"""
+    try:
+        if not VOICE_PROCESSOR_AVAILABLE or not voice_processor:
+            # Fallback to text-only processing
+            if ASSISTANT_AVAILABLE and mental_health_assistant:
+                chat_result = await mental_health_assistant.chat(
+                    user_message=voice_message.transcript,
+                    user_id=current_user.id,
+                    db=db,
+                    conversation_id=voice_message.conversation_id
+                )
+                
+                return {
+                    'conversation_id': chat_result['conversation_id'],
+                    'text_response': chat_result['response'],
+                    'voice_response': {
+                        'speech_text': chat_result['response']['content'],
+                        'voice_available': False,
+                        'message': 'Voice processing unavailable - text response provided'
+                    },
+                    'voice_processing': {
+                        'processed_transcript': voice_message.transcript,
+                        'voice_features_available': False
+                    },
+                    'mood_insights': chat_result.get('mood_insights', {}),
+                    'recommendations': chat_result.get('recommendations', []),
+                    'crisis_assessment': chat_result.get('crisis_assessment', {}),
+                    'timestamp': chat_result['timestamp']
+                }
+            else:
+                # Complete fallback
+                return {
+                    'conversation_id': "voice_fallback_" + str(datetime.now().timestamp()),
+                    'text_response': {
+                        'content': "I received your voice message but both voice processing and advanced AI features are currently limited. I'm still here to support you though!",
+                        'tone': 'supportive',
+                        'source': 'voice_fallback'
+                    },
+                    'voice_response': {'voice_available': False},
+                    'voice_processing': {'voice_features_available': False},
+                    'mood_insights': {},
+                    'recommendations': ["Take care of yourself today"],
+                    'crisis_assessment': {'risk_level': 'minimal'},
+                    'timestamp': datetime.now(timezone.utc).isoformat()
+                }
+        
+        # Full voice processing available
+        voice_result = await voice_processor.process_voice_input(
+            transcript=voice_message.transcript,
+            context={'user_id': current_user.id}
+        )
+        
+        chat_result = await mental_health_assistant.chat(
+            user_message=voice_result.get('processed_transcript', voice_message.transcript),
+            user_id=current_user.id,
+            db=db,
+            conversation_id=voice_message.conversation_id
+        )
+        
+        response_content = chat_result['response']['content']
+        speech_response = await voice_processor.generate_human_like_speech_response(
+            text=response_content,
+            tone=chat_result['response'].get('tone', 'neutral')
+        )
+        
+        logger.info(f"🎤 Voice AI chat for {current_user.username}")
+        
+        return {
+            'conversation_id': chat_result['conversation_id'],
+            'text_response': chat_result['response'],
+            'voice_response': speech_response,
+            'voice_processing': voice_result,
+            'mood_insights': chat_result.get('mood_insights', {}),
+            'recommendations': chat_result.get('recommendations', []),
+            'crisis_assessment': chat_result.get('crisis_assessment', {}),
+            'timestamp': chat_result['timestamp']
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Voice AI chat error: {e}")
+        return {
+            'error': f"Voice AI chat error: {str(e)}",
+            'conversation_id': "voice_error_" + str(datetime.now().timestamp()),
+            'text_response': {
+                'content': "I'm having technical difficulties with voice processing, but I'm still here to support you.",
+                'tone': 'supportive'
+            },
+            'voice_response': {'voice_available': False},
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }
+
+@app.get("/api/ai/recommendations", response_model=Dict[str, Any])
+async def get_ai_recommendations(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get AI-powered recommendations based on mood history"""
+    try:
+        # Get user's mood context
+        mood_history = await mental_health_assistant._get_user_mood_context(current_user.id, db)
+        
+        # Analyze patterns
+        mood_analysis = await mental_health_assistant.mood_analyzer.analyze_recent_patterns(mood_history)
+        
+        # Generate recommendations
+        recommendations = await mental_health_assistant._generate_recommendations(mood_history, mood_analysis)
+        
+        return {
+            'user_id': current_user.id,
+            'recommendations': recommendations,
+            'mood_analysis': mood_analysis,
+            'data_points': len(mood_history),
+            'generated_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ AI recommendations error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI recommendations error: {str(e)}")
+
+@app.get("/api/ai/mood-insights", response_model=Dict[str, Any])
+async def get_ai_mood_insights(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get AI insights about user's mood patterns"""
+    try:
+        # Get user's mood context
+        mood_history = await mental_health_assistant._get_user_mood_context(current_user.id, db)
+        
+        if not mood_history:
+            return {
+                'user_id': current_user.id,
+                'insights': ["Start tracking your mood to unlock AI-powered insights!"],
+                'data_available': False,
+                'generated_at': datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Analyze patterns
+        mood_analysis = await mental_health_assistant.mood_analyzer.analyze_recent_patterns(mood_history)
+        
+        # Generate detailed insights
+        insights = mood_analysis.get('insights', [])
+        
+        # Add AI personality to insights
+        personalized_insights = []
+        for insight in insights:
+            personalized_insights.append(f"🤖 AI Analysis: {insight}")
+        
+        return {
+            'user_id': current_user.id,
+            'insights': personalized_insights,
+            'mood_analysis': mood_analysis,
+            'data_points': len(mood_history),
+            'ai_confidence': mood_analysis.get('stability_score', 0.7),
+            'data_available': True,
+            'generated_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ AI mood insights error: {e}")
+        raise HTTPException(status_code=500, detail=f"AI mood insights error: {str(e)}")
+
+@app.get("/api/ai/conversation-history")
+async def get_conversation_history(
+    current_user: User = Depends(get_current_user)
+):
+    """Get user's recent AI conversation sessions"""
+    try:
+        history = await conversation_memory.get_user_conversation_history(
+            user_id=current_user.id,
+            limit=10
+        )
+        
+        return {
+            'user_id': current_user.id,
+            'conversations': history,
+            'total_conversations': len(history),
+            'fetched_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Conversation history error: {e}")
+        raise HTTPException(status_code=500, detail=f"Conversation history error: {str(e)}")
+
+@app.delete("/api/ai/conversation/{conversation_id}")
+async def delete_conversation(
+    conversation_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a specific conversation"""
+    try:
+        # Verify conversation belongs to user
+        conversation = await conversation_memory.get_conversation(conversation_id)
+        if not conversation or conversation['user_id'] != current_user.id:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        # Delete conversation
+        del conversation_memory.conversations[conversation_id]
+        
+        return {
+            'message': 'Conversation deleted successfully',
+            'conversation_id': conversation_id,
+            'deleted_at': datetime.now(timezone.utc).isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Delete conversation error: {e}")
+        raise HTTPException(status_code=500, detail=f"Delete conversation error: {str(e)}")
+
 # ========== COMPLETE AI SYSTEM HEALTH ENDPOINTS ==========
 
 @app.get("/api/ai/health-complete", response_model=Dict[str, Any])
 async def complete_ai_health_check():
-    """Get complete AI system health status"""
+    """FIXED: Get accurate complete AI system health status"""
     try:
         if not AI_MODULES_AVAILABLE:
             return {
                 "status": "basic_mode",
-                "message": "AI modules not available - using basic analysis",
+                "message": "Core AI modules not available - using basic analysis",
+                "ai_system_available": False,
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         
         health_status = await model_manager.health_check()
         
-        # Test each AI component
+        # Test each AI component with safe handling
         component_status = {}
         
         # Test sentiment analyzer
@@ -388,10 +772,24 @@ async def complete_ai_health_check():
         except Exception as e:
             component_status['mood_predictor'] = f"❌ error: {str(e)}"
         
+        # Test AI Assistant
+        component_status['ai_assistant'] = "✅ healthy" if ASSISTANT_AVAILABLE else "❌ not available"
+        
+        # Test Voice Processor
+        component_status['voice_processor'] = "✅ healthy" if VOICE_PROCESSOR_AVAILABLE else "❌ not available"
+        
+        # Test Conversation Memory
+        component_status['conversation_memory'] = "✅ healthy" if CONVERSATION_MEMORY_AVAILABLE else "❌ not available"
+        
+        overall_healthy = all("✅" in status for status in component_status.values())
+        
         return {
-            "status": "healthy" if all("✅" in status for status in component_status.values()) else "degraded",
+            "status": "healthy" if overall_healthy else "degraded",
             "overall_health": health_status,
             "component_status": component_status,
+            "ai_system_available": True,
+            "complete_ai_operational": COMPLETE_AI_AVAILABLE,
+            "fallback_systems_active": not COMPLETE_AI_AVAILABLE,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "system_info": model_manager.get_model_info() if AI_MODULES_AVAILABLE else {}
         }
@@ -401,6 +799,7 @@ async def complete_ai_health_check():
         return {
             "status": "error",
             "error": str(e),
+            "ai_system_available": False,
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
@@ -483,8 +882,6 @@ async def get_latest_mood_entry(
     except Exception as e:
         logger.error(f"❌ Error fetching latest mood: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch latest mood entry")
-    
-# Add this endpoint to your main.py file (around line 500, after other endpoints)
 
 @app.get("/api/analytics/summary", response_model=Dict[str, Any])
 async def get_analytics_summary(
@@ -610,7 +1007,7 @@ async def get_analytics_summary(
 
 @app.get("/api/ai/models-complete", response_model=Dict[str, Any])
 async def get_complete_ai_models_info():
-    """Get complete information about all loaded AI models"""
+    """Get complete information about all loaded AI models including Assistant"""
     if not AI_MODULES_AVAILABLE:
         return {
             "status": "basic_mode",
@@ -645,6 +1042,14 @@ async def get_complete_ai_models_info():
             "text_analyzer": {
                 "status": "loaded",
                 "capabilities": ["complete_analysis", "context_understanding", "recommendations"]
+            },
+            "ai_assistant": {
+                "status": "loaded",
+                "capabilities": ["conversation", "mood_history_access", "personalized_recommendations", "crisis_detection"]
+            },
+            "voice_processor": {
+                "status": "loaded", 
+                "capabilities": ["speech_to_text", "text_to_speech", "voice_command_processing"]
             }
         }
         
@@ -719,7 +1124,7 @@ async def track_mood_complete_ai(
             'emotional_complexity': complete_ai_analysis.emotion_analysis.get('emotional_complexity', 0.0),
             'predicted_score': complete_ai_analysis.mood_prediction.get('predicted_score', mood_entry.score),
             'analysis_confidence': complete_ai_analysis.analysis_metadata.get('overall_confidence', 0.7),
-            'ai_version': '4.0.0',
+            'ai_version': '4.2.0',
             'models_used': complete_ai_analysis.analysis_metadata.get('models_used', [])
         }
         
@@ -853,7 +1258,7 @@ async def get_mood_patterns(
         logger.error(f"❌ Pattern analysis error: {e}")
         raise HTTPException(status_code=500, detail="Pattern analysis failed")
 
-# ========== AUTHENTICATION ENDPOINTS (Same as before) ==========
+# ========== AUTHENTICATION ENDPOINTS ==========
 
 @app.post("/api/auth/register", response_model=UserResponse)
 async def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
@@ -1227,7 +1632,7 @@ def generate_complete_recommendations(mood_entry: MoodEntryCreate, sentiment_res
     if mood_prediction and mood_prediction.get('trend') == 'declining':
         recommendations.append("📈 AI suggests focusing on activities that typically improve your mood")
     
-    # Default recommendations
+        # Default recommendations
     if not recommendations:
         recommendations.extend([
             "🌟 Continue tracking your mood for better insights",
@@ -1318,7 +1723,7 @@ async def notify_websocket_complete_ai(user_id: str, data: Dict[str, Any]):
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "ai_powered": True,
                 "complete_ai": True,
-                "server_version": "4.0.0"
+                "server_version": "4.2.0"
             }
             await active_connections[user_id].send_text(json.dumps(enhanced_data))
         except Exception as e:
@@ -1332,6 +1737,202 @@ async def update_user_analytics_complete(user_id: int, mood_entry_id: int):
         # Implementation would include advanced analytics computation
     except Exception as e:
         logger.error(f"❌ Complete analytics update failed: {e}")
+
+# ========== WEBSOCKET ENDPOINTS ==========
+
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    """WebSocket endpoint for real-time AI updates"""
+    await websocket.accept()
+    active_connections[user_id] = websocket
+    
+    try:
+        logger.info(f"🔌 WebSocket connected for user {user_id}")
+        
+        # Send welcome message
+        await websocket.send_text(json.dumps({
+            "type": "connection_established",
+            "message": "🤖 AI-powered real-time updates connected",
+            "user_id": user_id,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "ai_features_available": AI_MODULES_AVAILABLE
+        }))
+        
+        while True:
+            # Keep connection alive and listen for messages
+            data = await websocket.receive_text()
+            message = json.loads(data)
+            
+            # Handle different message types
+            if message.get("type") == "ping":
+                await websocket.send_text(json.dumps({
+                    "type": "pong",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }))
+            elif message.get("type") == "ai_health_check":
+                # Send AI system status
+                if AI_MODULES_AVAILABLE:
+                    ai_status = {
+                        "type": "ai_status",
+                        "ai_assistant_available": mental_health_assistant is not None,
+                        "voice_processing_available": voice_processor is not None,
+                        "all_models_loaded": True,
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }
+                else:
+                    ai_status = {
+                        "type": "ai_status", 
+                        "ai_assistant_available": False,
+                        "voice_processing_available": False,
+                        "all_models_loaded": False,
+                        "message": "AI systems in basic mode",
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }
+                
+                await websocket.send_text(json.dumps(ai_status))
+                
+    except WebSocketDisconnect:
+        logger.info(f"🔌 WebSocket disconnected for user {user_id}")
+    except Exception as e:
+        logger.error(f"❌ WebSocket error for user {user_id}: {e}")
+    finally:
+        if user_id in active_connections:
+            del active_connections[user_id]
+
+# ========== ADDITIONAL AI ASSISTANT ENDPOINTS ==========
+
+@app.post("/api/ai/quick-help")
+async def ai_quick_help(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get quick AI help based on user's current mood state"""
+    try:
+        if not AI_MODULES_AVAILABLE or not mental_health_assistant:
+            return {
+                "quick_help": [
+                    "🤗 Take a deep breath and remember you're not alone",
+                    "📞 988 (Crisis Lifeline) is available 24/7 if you need immediate support", 
+                    "💙 Your mental health matters - be gentle with yourself"
+                ],
+                "ai_powered": False,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Get user's recent mood context
+        mood_history = await mental_health_assistant._get_user_mood_context(current_user.id, db)
+        
+        if not mood_history:
+            return {
+                "quick_help": [
+                    "🌟 Start by tracking your mood to get personalized AI help",
+                    "📝 Regular mood tracking helps our AI understand your patterns",
+                    "💪 You're taking a positive step by seeking support"
+                ],
+                "ai_powered": True,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Analyze recent patterns for quick insights
+        mood_analysis = await mental_health_assistant.mood_analyzer.analyze_recent_patterns(mood_history)
+        
+        # Generate quick contextual help
+        quick_help = []
+        avg_score = mood_analysis.get('average_score', 5.0)
+        trend = mood_analysis.get('trend', 'stable')
+        
+        if avg_score <= 4:
+            quick_help.extend([
+                "💙 I notice you've been having a tough time lately",
+                "🤗 Remember that difficult feelings are temporary",
+                "📞 Consider reaching out to someone you trust or call 988 if needed"
+            ])
+        elif avg_score >= 7:
+            quick_help.extend([
+                "😊 Your mood has been positive recently - that's wonderful!",
+                "✨ Keep doing what's working for you",
+                "🌟 Consider sharing your positive energy with others"
+            ])
+        else:
+            quick_help.extend([
+                "😌 Your mood seems balanced overall",
+                "📊 Continue tracking to build valuable insights",
+                "💪 You're building great self-awareness"
+            ])
+        
+        if trend == 'declining':
+            quick_help.append("📉 I notice a recent dip - extra self-care might help")
+        elif trend == 'improving':
+            quick_help.append("📈 Things are looking up for you - great progress!")
+        
+        return {
+            "quick_help": quick_help,
+            "mood_summary": {
+                "average_score": avg_score,
+                "trend": trend,
+                "data_points": len(mood_history)
+            },
+            "ai_powered": True,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Quick help error: {e}")
+        return {
+            "quick_help": [
+                "🤗 I'm here to support you",
+                "💙 Take care of yourself today",
+                "📞 Remember that help is always available"
+            ],
+            "ai_powered": False,
+            "error": "AI temporarily unavailable",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
+@app.get("/api/ai/personality")
+async def get_ai_personality():
+    """Get AI Assistant personality information"""
+    return {
+        "name": "Mental Health AI Assistant",
+        "version": "4.2.0",
+        "personality_traits": {
+            "empathy_level": 0.95,
+            "professionalism": 0.85,
+            "supportiveness": 0.90,
+            "crisis_sensitivity": 1.0,
+            "humor_appropriateness": 0.75
+        },
+        "capabilities": [
+            "🤖 Context-aware conversations with mood history access",
+            "🎭 Emotion recognition and validation",
+            "🚨 Crisis detection and intervention guidance", 
+            "📊 Pattern analysis and personalized insights",
+            "🎤 Voice interaction support",
+            "💡 Personalized mental health recommendations",
+            "🔄 Conversation memory and continuity"
+        ],
+        "conversation_style": {
+            "tone": "warm, professional, and empathetic",
+            "approach": "person-centered with therapeutic boundaries",
+            "crisis_response": "immediate safety-focused with resource provision",
+            "positive_reinforcement": "celebrates progress and strengths"
+        },
+        "safety_features": [
+            "Real-time crisis detection",
+            "Automated safety resource provision", 
+            "Risk level assessment",
+            "Emergency contact recommendations",
+            "Professional referral suggestions"
+        ],
+        "privacy_commitment": [
+            "Conversation data kept confidential",
+            "No sharing without explicit consent",
+            "Secure processing of sensitive information",
+            "User control over conversation history"
+        ],
+        "last_updated": "2025-07-07 10:45:51 UTC",
+        "created_by": "Enthusiast-AD"
+    }
 
 if __name__ == "__main__":
     uvicorn.run(

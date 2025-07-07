@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { showToast } from '../components/ui/EnhancedToast'
 import AnimatedButton from '../components/ui/AnimatedButton'
+import VoiceInput from '../components/voice/VoiceInput'
+import NotificationService from '../services/NotificationService'
 import { MoodCheckSkeleton } from '../components/ui/LoadingStates'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -27,6 +29,8 @@ function MoodCheck() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [showTips, setShowTips] = useState(true)
   const [selectedEmotionDetails, setSelectedEmotionDetails] = useState(null)
+  const [voiceMode, setVoiceMode] = useState(false)
+  const [voiceCommandsEnabled, setVoiceCommandsEnabled] = useState(true)
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true)
@@ -48,7 +52,8 @@ function MoodCheck() {
       emoji: '😊', 
       color: 'from-yellow-400 to-orange-400',
       description: 'Feeling joyful and content',
-      tips: ['Share this positivity with others', 'Take note of what made you happy']
+      tips: ['Share this positivity with others', 'Take note of what made you happy'],
+      voiceKeywords: ['happy', 'joyful', 'cheerful', 'glad', 'delighted', 'pleased']
     },
     { 
       id: 'sad', 
@@ -56,7 +61,8 @@ function MoodCheck() {
       emoji: '😢', 
       color: 'from-blue-400 to-blue-600',
       description: 'Feeling down or melancholy',
-      tips: ['Allow yourself to feel this emotion', 'Consider talking to someone you trust']
+      tips: ['Allow yourself to feel this emotion', 'Consider talking to someone you trust'],
+      voiceKeywords: ['sad', 'unhappy', 'down', 'blue', 'melancholy', 'depressed']
     },
     { 
       id: 'anxious', 
@@ -64,7 +70,8 @@ function MoodCheck() {
       emoji: '😰', 
       color: 'from-purple-400 to-pink-400',
       description: 'Feeling worried or nervous',
-      tips: ['Try deep breathing exercises', 'Focus on what you can control']
+      tips: ['Try deep breathing exercises', 'Focus on what you can control'],
+      voiceKeywords: ['anxious', 'worried', 'nervous', 'stressed', 'tense', 'uneasy']
     },
     { 
       id: 'calm', 
@@ -72,7 +79,8 @@ function MoodCheck() {
       emoji: '😌', 
       color: 'from-green-400 to-teal-400',
       description: 'Feeling peaceful and relaxed',
-      tips: ['Enjoy this peaceful moment', 'Practice mindfulness to maintain calm']
+      tips: ['Enjoy this peaceful moment', 'Practice mindfulness to maintain calm'],
+      voiceKeywords: ['calm', 'peaceful', 'relaxed', 'tranquil', 'serene', 'composed']
     },
     { 
       id: 'excited', 
@@ -80,7 +88,8 @@ function MoodCheck() {
       emoji: '🤗', 
       color: 'from-red-400 to-pink-400',
       description: 'Feeling enthusiastic and energetic',
-      tips: ['Channel this energy positively', 'Share your excitement with others']
+      tips: ['Channel this energy positively', 'Share your excitement with others'],
+      voiceKeywords: ['excited', 'thrilled', 'enthusiastic', 'energetic', 'pumped']
     },
     { 
       id: 'angry', 
@@ -88,7 +97,8 @@ function MoodCheck() {
       emoji: '😠', 
       color: 'from-red-500 to-red-700',
       description: 'Feeling frustrated or mad',
-      tips: ['Take deep breaths before reacting', 'Identify what triggered this feeling']
+      tips: ['Take deep breaths before reacting', 'Identify what triggered this feeling'],
+      voiceKeywords: ['angry', 'mad', 'furious', 'irritated', 'annoyed', 'frustrated']
     },
     { 
       id: 'tired', 
@@ -96,7 +106,8 @@ function MoodCheck() {
       emoji: '😴', 
       color: 'from-gray-400 to-gray-600',
       description: 'Feeling exhausted or drained',
-      tips: ['Consider getting more rest', 'Take breaks when needed']
+      tips: ['Consider getting more rest', 'Take breaks when needed'],
+      voiceKeywords: ['tired', 'exhausted', 'drained', 'fatigued', 'sleepy', 'weary']
     },
     { 
       id: 'stressed', 
@@ -104,7 +115,8 @@ function MoodCheck() {
       emoji: '😫', 
       color: 'from-orange-400 to-red-400',
       description: 'Feeling overwhelmed or pressured',
-      tips: ['Break tasks into smaller steps', 'Practice stress-relief techniques']
+      tips: ['Break tasks into smaller steps', 'Practice stress-relief techniques'],
+      voiceKeywords: ['stressed', 'overwhelmed', 'pressured', 'burdened']
     },
     { 
       id: 'confident', 
@@ -112,7 +124,8 @@ function MoodCheck() {
       emoji: '💪', 
       color: 'from-indigo-400 to-purple-400',
       description: 'Feeling self-assured and capable',
-      tips: ['Use this confidence to tackle challenges', 'Remember this feeling for tough times']
+      tips: ['Use this confidence to tackle challenges', 'Remember this feeling for tough times'],
+      voiceKeywords: ['confident', 'sure', 'self-assured', 'certain', 'positive']
     },
     { 
       id: 'lonely', 
@@ -120,21 +133,22 @@ function MoodCheck() {
       emoji: '😔', 
       color: 'from-blue-500 to-indigo-500',
       description: 'Feeling isolated or disconnected',
-      tips: ['Reach out to friends or family', 'Consider joining social activities']
+      tips: ['Reach out to friends or family', 'Consider joining social activities'],
+      voiceKeywords: ['lonely', 'isolated', 'alone', 'disconnected', 'solitary']
     }
   ]
 
   const activities = [
-    { value: 'work', label: '💼 Work', icon: '💼' },
-    { value: 'exercise', label: '🏃‍♀️ Exercise', icon: '🏃‍♀️' },
-    { value: 'socializing', label: '👥 Socializing', icon: '👥' },
-    { value: 'relaxing', label: '🧘‍♀️ Relaxing', icon: '🧘‍♀️' },
-    { value: 'studying', label: '📚 Studying', icon: '📚' },
-    { value: 'commuting', label: '🚗 Commuting', icon: '🚗' },
-    { value: 'sleeping', label: '😴 Sleeping', icon: '😴' },
-    { value: 'eating', label: '🍽️ Eating', icon: '🍽️' },
-    { value: 'entertainment', label: '🎬 Entertainment', icon: '🎬' },
-    { value: 'other', label: '🌟 Other', icon: '🌟' }
+    { value: 'work', label: '💼 Work', icon: '💼', voiceKeywords: ['work', 'working', 'office', 'job', 'meeting'] },
+    { value: 'exercise', label: '🏃‍♀️ Exercise', icon: '🏃‍♀️', voiceKeywords: ['exercise', 'workout', 'gym', 'running', 'walking'] },
+    { value: 'socializing', label: '👥 Socializing', icon: '👥', voiceKeywords: ['friends', 'family', 'party', 'hanging out', 'socializing'] },
+    { value: 'relaxing', label: '🧘‍♀️ Relaxing', icon: '🧘‍♀️', voiceKeywords: ['relaxing', 'resting', 'chilling', 'unwinding'] },
+    { value: 'studying', label: '📚 Studying', icon: '📚', voiceKeywords: ['studying', 'reading', 'learning', 'homework'] },
+    { value: 'commuting', label: '🚗 Commuting', icon: '🚗', voiceKeywords: ['commuting', 'driving', 'traveling'] },
+    { value: 'sleeping', label: '😴 Sleeping', icon: '😴', voiceKeywords: ['sleeping', 'napping', 'resting'] },
+    { value: 'eating', label: '🍽️ Eating', icon: '🍽️', voiceKeywords: ['eating', 'dining', 'food'] },
+    { value: 'entertainment', label: '🎬 Entertainment', icon: '🎬', voiceKeywords: ['watching', 'movies', 'tv', 'entertainment'] },
+    { value: 'other', label: '🌟 Other', icon: '🌟', voiceKeywords: ['other', 'something else'] }
   ]
 
   const moodDescriptions = {
@@ -148,6 +162,47 @@ function MoodCheck() {
     8: { text: "Really good", color: "text-green-700", bg: "bg-green-100" },
     9: { text: "Amazing!", color: "text-emerald-700", bg: "bg-emerald-100" },
     10: { text: "Absolutely fantastic!", color: "text-emerald-800", bg: "bg-emerald-200" }
+  }
+
+  // Handle voice commands
+  const handleVoiceCommand = (command) => {
+    console.log('🎤 Voice command received:', command)
+    
+    switch (command.type) {
+      case 'mood_score':
+        setMoodEntry(prev => ({ ...prev, score: command.value }))
+        showToast.success(`🎤 Mood score set to ${command.value}`)
+        break
+        
+      case 'emotions':
+        const newEmotions = [...new Set([...moodEntry.emotions, ...command.value])]
+        setMoodEntry(prev => ({ ...prev, emotions: newEmotions }))
+        showToast.success(`🎤 Added emotions: ${command.value.join(', ')}`)
+        break
+        
+      case 'activity':
+        setMoodEntry(prev => ({ ...prev, activity: command.value }))
+        showToast.success(`🎤 Activity set to ${command.value}`)
+        break
+        
+      case 'notes':
+        setMoodEntry(prev => ({ ...prev, notes: command.value }))
+        showToast.success('🎤 Notes added from voice input')
+        break
+        
+      default:
+        console.log('🎤 Unknown voice command:', command)
+    }
+  }
+
+  // Handle voice transcript for notes
+  const handleVoiceResult = (transcript) => {
+    if (currentStep === 4) { // Notes step
+      setMoodEntry(prev => ({
+        ...prev,
+        notes: prev.notes + (prev.notes ? ' ' : '') + transcript
+      }))
+    }
   }
 
   const handleEmotionToggle = (emotionId) => {
@@ -279,6 +334,8 @@ function MoodCheck() {
           setRecommendations(result.recommendations || [])
           if (result.intervention_triggered) {
             setCrisisAlert(true)
+            // Send crisis notification
+            await NotificationService.sendCrisisAlert()
           }
         } else if (result.analysis) {
           setAnalysis(result.analysis)
@@ -287,6 +344,12 @@ function MoodCheck() {
           setAnalysis(generateMockAnalysis(moodEntry))
           setRecommendations(generateMockRecommendations(moodEntry.score))
         }
+
+        // Send achievement notification for tracking
+        await NotificationService.sendAchievementNotification({
+          type: 'mood-tracked',
+          description: 'Mood tracked successfully!'
+        })
 
         showToast.success('🎉 Mood tracked successfully with AI analysis!')
         showCelebrationAndReset()
@@ -466,15 +529,43 @@ function MoodCheck() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          Let's track your mood with AI-powered insights and personalized recommendations
+          Track your mood with AI-powered insights and voice input
         </motion.p>
+
+        {/* Voice Mode Toggle */}
+        <motion.div 
+          className="flex items-center justify-center space-x-4 mb-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <span className="text-sm text-gray-600">Voice Mode:</span>
+          <motion.button
+            className={`w-12 h-6 rounded-full ${
+              voiceMode ? 'bg-blue-500' : 'bg-gray-300'
+            }`}
+            onClick={() => setVoiceMode(!voiceMode)}
+            whileTap={{ scale: 0.95 }}
+          >
+            <motion.div
+              className="w-4 h-4 bg-white rounded-full shadow-md"
+              animate={{
+                x: voiceMode ? 28 : 4
+              }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          </motion.button>
+          <span className="text-sm text-blue-600">
+            {voiceMode ? '🎤 Voice Enabled' : '✋ Manual Input'}
+          </span>
+        </motion.div>
 
         {/* Enhanced Progress Bar */}
         <motion.div 
           className="mt-8 bg-white rounded-full h-4 max-w-lg mx-auto shadow-inner border-2 border-blue-100"
           initial={{ width: 0 }}
           animate={{ width: "100%" }}
-          transition={{ delay: 0.6, duration: 0.8 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
         >
           <motion.div
             className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full rounded-full flex items-center justify-end pr-2"
@@ -496,11 +587,27 @@ function MoodCheck() {
           className="text-sm text-gray-500 mt-3 font-medium"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 1.0 }}
         >
           Step {currentStep} of 4 • {progressPercentage === 100 ? 'Ready to submit!' : 'Keep going!'}
         </motion.p>
       </motion.div>
+
+      {/* Voice Input Integration */}
+      {voiceMode && (
+        <motion.div
+          className="mb-8 p-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <VoiceInput
+            onVoiceCommand={handleVoiceCommand}
+            onVoiceResult={handleVoiceResult}
+            disabled={isSubmitting}
+          />
+        </motion.div>
+      )}
 
       {/* Enhanced Offline Status */}
       <AnimatePresence>
@@ -600,9 +707,26 @@ function MoodCheck() {
                 transition={{ duration: 0.4 }}
               >
                 <div className="text-center">
+                  {/* Voice Tip for Step 1 */}
+                  {voiceMode && (
+                    <motion.div
+                      className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                    >
+                      <div className="flex items-center">
+                        <span className="text-2xl mr-2">🎤</span>
+                        <div className="text-left">
+                          <p className="font-semibold text-blue-800">Voice Tip</p>
+                          <p className="text-blue-700 text-sm">Say "I feel a 7 out of 10" or "My mood is 5"</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {/* Tips Section */}
                   <AnimatePresence>
-                    {showTips && (
+                    {showTips && !voiceMode && (
                       <motion.div
                         className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8"
                         initial={{ opacity: 0, height: 0 }}
@@ -691,7 +815,7 @@ function MoodCheck() {
               </motion.div>
             )}
 
-            {/* Step 2: Enhanced Emotion Selection */}
+            {/* Step 2: Enhanced Emotion Selection with Voice */}
             {currentStep === 2 && (
               <motion.div
                 key="step2"
@@ -707,6 +831,23 @@ function MoodCheck() {
                       What emotions are you experiencing?
                     </h2>
                     <p className="text-gray-600">Select all that apply - it's okay to feel multiple emotions</p>
+                    
+                    {/* Voice Tip for Step 2 */}
+                    {voiceMode && (
+                      <motion.div
+                        className="bg-green-50 border border-green-200 rounded-xl p-4 mt-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <div className="flex items-center justify-center">
+                          <span className="text-2xl mr-2">🎤</span>
+                          <p className="text-green-700 text-sm">
+                            Say "I'm feeling happy and excited" or "I feel sad and tired"
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+
                     <motion.div 
                       className="inline-block mt-4 px-4 py-2 bg-blue-100 rounded-full"
                       animate={{ scale: moodEntry.emotions.length > 0 ? [1, 1.05, 1] : 1 }}
@@ -825,7 +966,7 @@ function MoodCheck() {
               </motion.div>
             )}
 
-            {/* Step 3: Enhanced Context Information */}
+            {/* Step 3: Enhanced Context Information with Voice */}
             {currentStep === 3 && (
               <motion.div
                 key="step3"
@@ -841,6 +982,22 @@ function MoodCheck() {
                       Add some context
                     </h2>
                     <p className="text-gray-600">This helps our AI provide better insights (optional)</p>
+                    
+                    {/* Voice Tip for Step 3 */}
+                    {voiceMode && (
+                      <motion.div
+                        className="bg-orange-50 border border-orange-200 rounded-xl p-4 mt-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <div className="flex items-center justify-center">
+                          <span className="text-2xl mr-2">🎤</span>
+                          <p className="text-orange-700 text-sm">
+                            Say "I'm working from home" or "I'm at the gym exercising"
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Enhanced Activity Selection */}
@@ -920,7 +1077,7 @@ function MoodCheck() {
               </motion.div>
             )}
 
-            {/* Step 4: Enhanced Notes */}
+            {/* Step 4: Enhanced Notes with Voice Transcription */}
             {currentStep === 4 && (
               <motion.div
                 key="step4"
@@ -936,6 +1093,22 @@ function MoodCheck() {
                       What's on your mind?
                     </h2>
                     <p className="text-gray-600">Share your thoughts for better AI insights (optional)</p>
+                    
+                    {/* Voice Tip for Step 4 */}
+                    {voiceMode && (
+                      <motion.div
+                        className="bg-purple-50 border border-purple-200 rounded-xl p-4 mt-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <div className="flex items-center justify-center">
+                          <span className="text-2xl mr-2">🎤</span>
+                          <p className="text-purple-700 text-sm">
+                            Speak naturally about your day, feelings, or what's happening
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                   
                   <motion.div
@@ -1190,7 +1363,7 @@ function MoodCheck() {
               >
                 <motion.span 
                   className="mr-3 text-3xl"
-                  animate={{ scale: [1, 1.2, 1] }}
+                                  animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   💡

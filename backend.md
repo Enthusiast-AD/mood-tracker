@@ -200,3 +200,11 @@ curl -X POST http://localhost:8000/api/mood/track-complete \
     "activity": "testing",
     "location": "home"
   }'
+
+  curl -X POST "http://localhost:8000/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "aitest_user",
+    "password": "password123"
+  }'
+

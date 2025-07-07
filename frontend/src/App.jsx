@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { MoodProvider } from './contexts/MoodContext'
@@ -11,6 +11,7 @@ import ServiceWorkerUpdate from './components/ServiceWorkerUpdate'
 import PageTransition from './components/animations/PageTransition'
 import EnhancedToaster from './components/ui/EnhancedToast'
 import FloatingActionButton from './components/ui/FloatingActionButton'
+import SmartNotificationScheduler from './services/SmartNotificationScheduler'
 
 // Pages
 import HomePage from './pages/HomePage'
@@ -25,6 +26,12 @@ import Navigation from './pages/Navigation'
 import './App.css'
 
 function App() {
+  useEffect(() => {
+    // Initialize smart notifications when app starts
+    console.log('🔔 Initializing Smart Notification System...')
+    // SmartNotificationScheduler is already initialized as singleton
+  }, [])
+
   return (
     <ErrorBoundary>
       <AuthProvider>
