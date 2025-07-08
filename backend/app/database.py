@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # Database URL from environment
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    "postgresql://admin:password123@localhost:5432/mental_health_db"
+    "postgresql://neondb_owner:npg_ksVuyNvl82Mj@ep-lingering-scene-a8o1uzql-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 )
 
 # For SQLite fallback in development
