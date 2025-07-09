@@ -1,0 +1,30 @@
+# Ignore Python bytecode and cache
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment and egg-info
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Ignore database files and model cache
+*.db
+mental_health.db
+models_cache/
+mental_health_backend.egg-info/
+
+# Ignore test output and logs
+*.log
+test_database_stress.py
+test_websocket_day3.py
+test_day3_complete.py
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore IDE and OS-specific files
+.vscode/
+.DS_Store
+Thumbs.db
