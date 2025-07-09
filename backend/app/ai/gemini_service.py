@@ -9,6 +9,10 @@ import asyncio
 import json
 from typing import Dict, Any, Optional
 from datetime import datetime
+
+from dotenv import load_dotenv
+load_dotenv()
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -65,7 +69,7 @@ class GeminiService:
             ]
             
             self.model = genai.GenerativeModel(
-                model_name="gemini-pro",
+                model_name="gemini-2.0-flash",
                 generation_config=generation_config,
                 safety_settings=safety_settings
             )
