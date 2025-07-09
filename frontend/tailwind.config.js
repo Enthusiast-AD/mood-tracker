@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class', // Enable dark mode support
   theme: {
     extend: {
       colors: {
@@ -48,4 +49,5 @@ export default {
     },
   },
   plugins: [],
-}
+
+} 

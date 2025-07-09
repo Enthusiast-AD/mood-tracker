@@ -128,6 +128,10 @@ body {
   }
 }
 
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 /* Animation classes */
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
@@ -411,3 +415,87 @@ body {
   background: rgba(102, 126, 234, 0.3);
   color: #1a202c;
 }
+
+/* Light mode (default) */
+body {
+  background: #fff;
+  color: #1a202c;
+}
+
+/* Dark mode overrides */
+.dark body {
+  background: #18181b;
+  color: #f3f4f6;
+}
+
+.dark .bg-white {
+  background-color: #23272f !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-700,
+.dark .text-gray-900 {
+  color: #e5e7eb !important;
+}
+
+.dark .border-gray-100 {
+  border-color: #2d3748 !important;
+}
+
+.dark .shadow-lg,
+.dark .shadow-xl {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.8) !important;
+}
+
+.dark .hover\:bg-blue-50:hover,
+.dark .bg-blue-50 {
+  background-color: #23272f !important;
+}
+
+.dark .bg-gradient-to-r {
+  filter: brightness(0.9) contrast(1.2);
+}
+
+.dark .border-blue-200 {
+  border-color: #4f46e5 !important;
+}
+
+.dark .text-blue-600,
+.dark .hover\:text-blue-600:hover {
+  color: #a5b4fc !important;
+}
+
+.dark .bg-gray-900 {
+  background-color: #18181b !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #23272f !important;
+}
+
+.dark .text-white {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-red-600 {
+  color: #f87171 !important;
+}
+
+.dark .hover\:bg-red-50:hover {
+  background-color: #3f1d2e !important;
+}
+
+/* Scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #23272f;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+}
+.dark ::selection,
+.dark ::-moz-selection {
+  background: rgba(102, 126, 234, 0.5);
+  color: #f3f4f6;
+}
+
+/* ...add more as needed for your components... */

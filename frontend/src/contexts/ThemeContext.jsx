@@ -7,7 +7,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
-const ThemeContext = createContext()
+export const ThemeContext = createContext();
 
 export const useTheme = () => {
   const context = useContext(ThemeContext)
@@ -18,7 +18,10 @@ export const useTheme = () => {
 }
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState(() => {
+    // Get saved theme or use system preference
+    return localStorage.getItem('theme') || 'light';
+  });
   const [accentColor, setAccentColor] = useState('blue')
   const [moodTheme, setMoodTheme] = useState(null)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -29,7 +32,7 @@ export const ThemeProvider = ({ children }) => {
     const savedTheme = localStorage.getItem('theme') || 'light'
     const savedAccent = localStorage.getItem('accentColor') || 'blue'
     const savedMoodTheme = localStorage.getItem('moodTheme')
-    
+
     setTheme(savedTheme)
     setAccentColor(savedAccent)
     if (savedMoodTheme) {
@@ -40,10 +43,10 @@ export const ThemeProvider = ({ children }) => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    
+
     setReducedMotion(prefersReducedMotion)
     setHighContrast(prefersHighContrast)
-    
+
     // Auto-switch to dark mode if no saved preference and system prefers dark
     if (!localStorage.getItem('theme') && prefersDark) {
       setTheme('dark')
@@ -73,11 +76,27 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [])
 
+  // Apply dark mode class to root element
+  // This is for Tailwind CSS dark mode support
+  useEffect(() => {
+    const root = window.document.documentElement;
+
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+
+
   useEffect(() => {
     // Apply theme to document
     document.documentElement.setAttribute('data-theme', theme)
     document.documentElement.setAttribute('data-accent', accentColor)
-    
+
     if (moodTheme) {
       document.documentElement.setAttribute('data-mood-theme', moodTheme)
     } else {
@@ -105,7 +124,7 @@ export const ThemeProvider = ({ children }) => {
   }, [theme, accentColor, moodTheme, reducedMotion, highContrast])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark')
   }
 
   const setMoodResponsiveTheme = (moodScore) => {
@@ -184,14 +203,14 @@ export const ThemeProvider = ({ children }) => {
     moodTheme,
     reducedMotion,
     highContrast,
-    
+
     // Actions
     setTheme,
     toggleTheme,
     setAccentColor,
     setMoodResponsiveTheme,
     clearMoodTheme,
-    
+
     // Utilities
     getThemeColors,
     isDark: theme === 'dark',
@@ -203,4 +222,7 @@ export const ThemeProvider = ({ children }) => {
       {children}
     </ThemeContext.Provider>
   )
+
+
 }
+

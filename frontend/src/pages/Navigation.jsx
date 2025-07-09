@@ -1,12 +1,18 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 
-function Navigation() {
+
+const Navigation=()=> {
+  const { theme, toggleTheme } = useTheme(); // ✅ THIS FIXES theme is not defined
+
   const location = useLocation()
   const { isAuthenticated, user, logout } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
+
+
 
   const navItems = [
     { path: '/', label: 'Home', emoji: '🏠', public: true },
@@ -31,8 +37,9 @@ function Navigation() {
     setShowUserMenu(false)
   }
 
+
   return (
-    <motion.nav 
+    <motion.nav
       className="bg-white shadow-lg border-b border-gray-100"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -42,9 +49,9 @@ function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <motion.span 
+            <motion.span
               className="text-3xl"
-              whileHover={{ 
+              whileHover={{
                 scale: 1.2,
                 rotate: [0, -10, 10, -10, 0]
               }}
@@ -52,31 +59,30 @@ function Navigation() {
             >
               🧠
             </motion.span>
-            <motion.span 
+            <motion.span
               className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
             >
               Mental Health AI
             </motion.span>
           </Link>
-          
+
           {/* Navigation Items */}
           <div className="hidden md:flex space-x-1">
             {navItems.map(item => {
               // Show public items always, protected items only when authenticated
               if (item.protected && !isAuthenticated) return null
-              
+
               return (
                 <motion.div key={item.path} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to={item.path}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                      isActive(item.path)
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                    }`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                      }`}
                   >
-                    <motion.span 
+                    <motion.span
                       className="text-lg"
                       animate={isActive(item.path) ? {
                         scale: [1, 1.2, 1],
@@ -127,7 +133,7 @@ function Navigation() {
                         <p className="text-sm font-medium text-gray-700">{user?.full_name || user?.username}</p>
                         <p className="text-xs text-gray-500">{user?.email}</p>
                       </div>
-                      
+
                       <Link
                         to="/dashboard"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
@@ -136,7 +142,7 @@ function Navigation() {
                         <span>📊</span>
                         <span>Dashboard</span>
                       </Link>
-                      
+
                       <Link
                         to="/mood-check"
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
@@ -145,9 +151,9 @@ function Navigation() {
                         <span>📝</span>
                         <span>Track Mood</span>
                       </Link>
-                      
+
                       <hr className="my-2" />
-                      
+
                       <button
                         onClick={handleLogout}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -166,11 +172,10 @@ function Navigation() {
                   <motion.div key={item.path} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                       to={item.path}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                        item.path === '/auth/login'
-                          ? 'text-blue-600 hover:bg-blue-50 border border-blue-200'
-                          : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${item.path === '/auth/login'
+                        ? 'text-blue-600 hover:bg-blue-50 border border-blue-200'
+                        : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl'
+                        }`}
                     >
                       <span className="text-lg">{item.emoji}</span>
                       <span className="hidden sm:inline">{item.label}</span>
@@ -180,6 +185,11 @@ function Navigation() {
               </div>
             )}
           </div>
+
+          {/* Theme Toggle Button */}
+          <button onClick={toggleTheme} className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:opacity-80 transition">
+            {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+          </button>
         </div>
 
         {/* Mobile Navigation */}
@@ -187,16 +197,15 @@ function Navigation() {
           <div className="flex flex-wrap justify-center gap-2">
             {navItems.map(item => {
               if (item.protected && !isAuthenticated) return null
-              
+
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                    isActive(item.path)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
                 >
                   <span className="text-lg">{item.emoji}</span>
                   <span className="text-xs">{item.label}</span>

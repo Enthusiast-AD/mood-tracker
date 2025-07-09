@@ -220,7 +220,7 @@ function HomePage() {
           className="text-center mb-16"
           variants={itemVariants}
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          <h2 className="text-4xl font-bold text-gray-600 mb-4">
             Why Choose Mental Health AI?
           </h2>
           <p className="text-xl text-gray-600">
@@ -250,7 +250,7 @@ function HomePage() {
                 {feature.icon}
               </motion.div>
               
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+              <h3 className="text-xl font-semibold text-gray-600 mb-4 text-center">
                 {feature.title}
               </h3>
               
