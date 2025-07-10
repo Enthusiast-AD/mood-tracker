@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
         <motion.div 
           className="max-w-7xl mx-auto px-4 py-8"
           variants={containerVariants}
@@ -117,7 +117,7 @@ const Dashboard = () => {
                 Welcome back, {user?.full_name?.split(' ')[0] || user?.username}!
               </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Your AI-powered mental health companion is here to support you every step of the way 🌟
             </p>
           </motion.div>
@@ -127,7 +127,7 @@ const Dashboard = () => {
             className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
             variants={itemVariants}
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-800 dark:to-blue-900 rounded-2xl p-6 text-white shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-sm font-medium">AI Assistant</p>
@@ -137,7 +137,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-800 dark:to-green-900 rounded-2xl p-6 text-white shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm font-medium">Crisis Support</p>
@@ -147,7 +147,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-800 dark:to-purple-900 rounded-2xl p-6 text-white shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm font-medium">Voice Chat</p>
@@ -157,7 +157,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl">
+            <div className="bg-gradient-to-r from-pink-500 to-pink-600 dark:from-pink-800 dark:to-pink-900 rounded-2xl p-6 text-white shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-pink-100 text-sm font-medium">Insights</p>
@@ -179,7 +179,7 @@ const Dashboard = () => {
               <AIInsightsDashboard />
 
               {/* Action Cards */}
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center mb-6">
                   <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl mr-4">
                     <Zap className="w-6 h-6 text-white" />
@@ -236,16 +236,18 @@ const Dashboard = () => {
               variants={itemVariants}
             >
               <AIInsightWidget user={user} />
+
               
               {/* Achievement Card */}
-              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+              
+              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center mb-4">
                   <Award className="w-6 h-6 text-yellow-500 mr-3" />
                   <h3 className="text-lg font-bold text-gray-900">Your Progress</h3>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-950 rounded-xl border border-blue-100 dark:border-blue-900">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                         <Brain className="w-5 h-5 text-white" />
@@ -258,7 +260,7 @@ const Dashboard = () => {
                     <span className="text-2xl">✨</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900 dark:to-emerald-950 rounded-xl border border-green-100 dark:border-green-900">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
                         <Shield className="w-5 h-5 text-white" />
@@ -271,7 +273,7 @@ const Dashboard = () => {
                     <span className="text-2xl">🛡️</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-950 rounded-xl border border-purple-100 dark:border-purple-900">
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3">
                         <MessageCircle className="w-5 h-5 text-white" />
