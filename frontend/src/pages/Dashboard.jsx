@@ -238,8 +238,7 @@ const Dashboard = () => {
               <AIInsightWidget user={user} />
 
               
-              {/* Achievement Card */}
-              
+              {/* progress card */}
               <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center mb-4">
                   <Award className="w-6 h-6 text-yellow-500 mr-3" />

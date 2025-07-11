@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
 
 
-const Navigation=()=> {
+const Navigation = () => {
   const { theme, toggleTheme } = useTheme(); // ✅ THIS FIXES theme is not defined
 
   const location = useLocation()
@@ -15,9 +15,9 @@ const Navigation=()=> {
 
 
   const navItems = [
-    { path: '/', label: 'Home', emoji: '🏠', public: true },
-    { path: '/mood-check', label: 'Mood Check', emoji: '📝', protected: true },
-    { path: '/dashboard', label: 'Dashboard', emoji: '📊', protected: true },
+    { path: '/', label: 'Home', emoji: '', public: true },
+    { path: '/mood-check', label: 'Mood Check', emoji: '', protected: true },
+    { path: '/dashboard', label: 'Dashboard', emoji: '', protected: true },
     { path: '/crisis-support', label: 'Crisis Support', emoji: '🆘', public: true }
   ]
 
@@ -47,24 +47,21 @@ const Navigation=()=> {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <motion.span
-              className="text-3xl"
-              whileHover={{
-                scale: 1.2,
-                rotate: [0, -10, 10, -10, 0]
-              }}
-              transition={{ duration: 0.6 }}
-            >
-              🧠
-            </motion.span>
-            <motion.span
-              className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
-            >
-              Mental Health AI
-            </motion.span>
+          <Link to="../HomePage.jsx" className="flex items-center space-x-3 group">
+
+            <div className="relative inline-block">
+              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+                Mental Health AI
+              </h1>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent bg-clip-text"
+                style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, white, transparent)', maskImage: 'linear-gradient(to right, transparent, white, transparent)' }}
+                animate={{ x: ['-100%', '100%'] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </div>
           </Link>
 
           {/* Navigation Items */}
