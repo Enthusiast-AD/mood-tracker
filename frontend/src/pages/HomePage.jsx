@@ -296,7 +296,7 @@ function HomePage() {
 
       {/* Features Grid */}
       <motion.div
-        className="max-w-7xl mx-auto px-4 py-20 bg-transparent rounded-xl"
+        className="max-w-7xl mx-auto px-4 py-20"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -305,19 +305,44 @@ function HomePage() {
           className="text-center mb-16"
           variants={itemVariants}
         >
-          <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
-            Powerful Features for Your Wellness Journey
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <motion.h2
+            className="text-5xl font-bold mb-4 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <motion.span
+              className="inline-block bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                backgroundSize: '200% 200%'
+              }}
+            >
+              Powerful Features for Your Wellness Journey
+            </motion.span>
+          </motion.h2>
+          <motion.p
+            className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
             Experience cutting-edge technology designed to support your mental health with privacy and compassion at its core.
-          </p>
+          </motion.p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="bg-gray-50 dark:bg-gray-800 shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-800 hover:bg-white hover:shadow-xl transition-all duration-300"
+              className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
               variants={itemVariants}
               whileHover={{
                 y: -8,
@@ -328,7 +353,8 @@ function HomePage() {
               <motion.div
                 className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-2xl mb-6`}
                 whileHover={{
-                  scale: 1.1
+                  scale: 1.1,
+                  rotate: 5
                 }}
                 transition={{ duration: 0.3 }}
               >
@@ -397,10 +423,9 @@ function HomePage() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/auth/register"
-                    className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
+                    className="bg-white dark:bg-gray-400 text-blue-600 dark:text-blue-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
                   >
-                    <span className="text-xl">🎉</span>
-                    <span>Start Free Today</span>
+                    <span className="text-xl">Start Free Today</span>
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -417,7 +442,45 @@ function HomePage() {
           </motion.div>
         </div>
       </motion.div>
+      {/* footer */}
+      <footer className=" bg-gray-100 text-gray-800 py-8 mt-16 dark:bg-gray-900 dark:text-gray-400 ">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 dark:text-gray-400">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <Link to="/privacy" className="text-gray-800 text-sm dark:text-gray-200">Privacy Policy</Link>
+            <span className="mx-2">|</span>
+            <Link to="/terms" className="text-gray-800 text-sm dark:text-gray-200">Terms of Service</Link>
+            <span className="mx-2">|</span>
+            <Link to="/contact" className="text-gray-800 text-sm dark:text-gray-200">Contact Us</Link>
+          </div>
+
+
+          <div className="mt-4">
+            <Link to="/about" className="text-gray-800 text-sm dark:text-gray-200">About Us</Link>
+            <span className="mx-2">|</span>
+            <Link to="/blog" className="text-gray-800 text-sm dark:text-gray-200">Blog</Link>
+            <span className="mx-2">|</span>
+            <Link to="/help" className="text-gray-800 text-sm dark:text-gray-200">Help Center</Link>
+
+            <div className="ml-auto">
+              <Link to="/faq" className="text-gray-800 dark:text-gray-200 text-sm">FAQ</Link>
+              <span className="mx-2">|</span>
+              <Link to="/support" className="text-gray-800 dark:text-gray-200 text-sm">Support</Link>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-sm">&copy; {new Date().getFullYear()} Mood Tracker. All rights reserved.</p>
+          <p className="text-xs mt-2">Made with ❤️</p>
+        </div>
+
+      </footer>
     </div>
+
   )
 }
 
