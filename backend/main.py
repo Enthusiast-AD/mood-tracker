@@ -617,8 +617,8 @@ async def get_ai_recommendations(
         # Analyze patterns
         mood_analysis = await mental_health_assistant.mood_analyzer.analyze_recent_patterns(mood_history)
         
-        # Generate recommendations
-        recommendations = await mental_health_assistant._generate_recommendations(mood_history, mood_analysis)
+        # Generate recommendations (pass an empty string as user_message)
+        recommendations = await mental_health_assistant._generate_recommendations("", mood_history)
         
         return {
             'user_id': current_user.id,
@@ -631,7 +631,7 @@ async def get_ai_recommendations(
     except Exception as e:
         logger.error(f"❌ AI recommendations error: {e}")
         raise HTTPException(status_code=500, detail=f"AI recommendations error: {str(e)}")
-
+    
 @app.get("/api/ai/mood-insights", response_model=Dict[str, Any])
 async def get_ai_mood_insights(
     current_user: User = Depends(get_current_user),
