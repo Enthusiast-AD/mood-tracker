@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { motion } from 'framer-motion'
+import { Brain } from 'lucide-react'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +11,7 @@ const LoginPage = () => {
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  
+
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -29,14 +31,14 @@ const LoginPage = () => {
 
     try {
       const result = await login(formData)
-      
+
       if (result.success) {
         console.log('✅ Login successful, redirecting...')
         navigate('/dashboard')
       } else {
         // Make sure we're setting a string, not an object
-        const errorMessage = typeof result.error === 'string' 
-          ? result.error 
+        const errorMessage = typeof result.error === 'string'
+          ? result.error
           : result.error?.detail || 'Login failed'
         setError(errorMessage)
       }
@@ -50,12 +52,24 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
+      <div className="max-w-md mt-3 w-full space-y-8">
+        <div className="text-center mb-2">
+          <div className="flex items-center gap-3 justify-center mb-6">
+            <motion.div
+              className="p-2.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              <Brain className="w-8 h-8 text-white" />
+            </motion.div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            🧠 Mental Health AI
+            <span>
+              Mental Health AI
+            </span>
+
           </h1>
-          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-6">
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
             Sign in to your account
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
@@ -117,11 +131,10 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white font-semibold transition-colors ${
-              isLoading
-                ? 'bg-gray-400 dark:bg-gray-700 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'
-            }`}
+            className={`w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg text-white font-semibold transition-colors ${isLoading
+              ? 'bg-gray-400 dark:bg-gray-700 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'
+              }`}
           >
             {isLoading ? (
               <>
@@ -136,8 +149,8 @@ const LoginPage = () => {
           <div className="text-center">
             <p className="text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link 
-                to="/auth/register" 
+              <Link
+                to="/auth/register"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold"
               >
                 Sign up here
@@ -152,14 +165,14 @@ const LoginPage = () => {
             💡 Demo Credentials
           </h3>
           <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-            <p><strong>Username:</strong> aitest_user</p>
+            <p><strong>Username:</strong> user_AItest</p>
             <p><strong>Password:</strong> password123</p>
           </div>
           <button
             type="button"
             onClick={() => {
               setFormData({
-                username: 'aitest_user',
+                username: 'user_AItest',
                 password: 'password123'
               })
             }}

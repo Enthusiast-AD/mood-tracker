@@ -97,17 +97,6 @@ function HomePage() {
     }
   }
 
-  // Animated emoji state
-  const faceEmojis = ['😃', '😁', '😊', '😎', '🥳', '😇', '🤩', '😌', '😅', '😂', '😍', '😴', '😐', '😮‍💨', '😔', '😢', '😭', '😡', '😱', '😇']
-  const [emojiIndex, setEmojiIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setEmojiIndex((prev) => (prev + 1) % faceEmojis.length)
-    }, 1200) // Change emoji every 1.2 seconds
-    return () => clearInterval(interval)
-  }, [])
-
   const moodCards = [
     { emoji: "😊", label: "Happy", color: "from-blue-500 to-purple-600" },
     { emoji: "🎯", label: "Focused", color: "from-pink-500 to-orange-500" },
@@ -141,7 +130,7 @@ function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -161,9 +150,37 @@ function HomePage() {
             >
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
                 Your Mental Health
-                <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
-                  Companion
-                </span>
+                <motion.h2
+                  className="relative text-6xl font-bold overflow-hidden justify-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 1.2 }}
+                >
+                  {/* Base gradient text */}
+                  <span className="inline-block bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Companion
+                  </span>
+
+                  {/* Smooth shimmer effect */}
+                  <motion.span
+                    className="absolute inset-0 bg-clip-text text-transparent"
+                    style={{
+                      backgroundSize: '200% 100%',
+                      backgroundImage: 'linear-gradient(90deg, transparent 0%, transparent 45%, rgba(59, 130, 246, 0.9) 50%, transparent 55%, transparent 100%)'
+                    }}
+                    animate={{
+                      backgroundPosition: ['200% 0', '-200% 0']
+                    }}
+                    transition={{
+                      duration: 10,
+                      ease: "linear",
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                  >
+                    Companion
+                  </motion.span>
+                </motion.h2>
               </h1>
 
               <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg">
@@ -312,7 +329,7 @@ function HomePage() {
             transition={{ delay: 0.3, duration: 0.8 }}
           >
             <motion.span
-              className="inline-block bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+              className="inline-block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-600 dark:bg-gradient-to-r dark:from-blue-400 dark:via-purple-400 dark:to-pink-400  bg-clip-text text-transparent"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -322,7 +339,7 @@ function HomePage() {
                 ease: "linear"
               }}
               style={{
-                backgroundSize: '200% 200%'
+                backgroundSize: '200% 100%'
               }}
             >
               Powerful Features for Your Wellness Journey

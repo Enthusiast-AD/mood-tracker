@@ -145,7 +145,7 @@ function MoodCheck() {
     { value: 'relaxing', label: '🧘‍♀️ Relaxing', icon: '🧘‍♀️', voiceKeywords: ['relaxing', 'resting', 'chilling', 'unwinding'] },
     { value: 'studying', label: '📚 Studying', icon: '📚', voiceKeywords: ['studying', 'reading', 'learning', 'homework'] },
     { value: 'commuting', label: '🚗 Commuting', icon: '🚗', voiceKeywords: ['commuting', 'driving', 'traveling'] },
-    { value: 'sleeping', label: '😴 Sleeping', icon: '😴', voiceKeywords: ['sleeping', 'napping', 'resting'] },
+    { value: 'sleeping', label: '😴 sleepy', icon: '😴', voiceKeywords: ['sleeping', 'napping', 'resting'] },
     { value: 'eating', label: '🍽️ Eating', icon: '🍽️', voiceKeywords: ['eating', 'dining', 'food'] },
     { value: 'entertainment', label: '🎬 Entertainment', icon: '🎬', voiceKeywords: ['watching', 'movies', 'tv', 'entertainment'] },
     { value: 'other', label: '🌟 Other', icon: '🌟', voiceKeywords: ['other', 'something else'] }
@@ -156,7 +156,7 @@ function MoodCheck() {
     2: { text: "Having a tough time", color: "text-red-600", bg: "bg-red-50" },
     3: { text: "Feeling low", color: "text-orange-600", bg: "bg-orange-50" },
     4: { text: "Not great", color: "text-yellow-600", bg: "bg-yellow-50" },
-    5: { text: "Okay, neutral", color: "text-gray-600", bg: "bg-gray-50" },
+    5: { text: "Okay, neutral", color: "text-gray-600", bg: "bg-gray-50 dark:bg-gray-600 " },
     6: { text: "Pretty good", color: "text-blue-600", bg: "bg-blue-50" },
     7: { text: "Feeling good", color: "text-green-600", bg: "bg-green-50" },
     8: { text: "Really good", color: "text-green-700", bg: "bg-green-100" },
@@ -510,7 +510,7 @@ function MoodCheck() {
         transition={{ delay: 0.2 }}
       >
         <motion.h1 
-          className="text-5xl font-bold text-gray-900 mb-4"
+          className="text-5xl font-bold text-gray-900 mt-2 mb-4"
           animate={{ 
             scale: [1, 1.02, 1]
           }}
@@ -520,7 +520,7 @@ function MoodCheck() {
             repeatType: "reverse"
           }}
         >
-          🧠 How are you feeling today?
+          How are you feeling today?
         </motion.h1>
         
         <motion.p 
@@ -689,7 +689,7 @@ function MoodCheck() {
 
       {/* Main Form Container */}
       <motion.div 
-        className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -728,7 +728,7 @@ function MoodCheck() {
                   <AnimatePresence>
                     {showTips && !voiceMode && (
                       <motion.div
-                        className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8"
+                        className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
@@ -737,8 +737,8 @@ function MoodCheck() {
                           <div className="flex items-center">
                             <span className="text-2xl mr-2">💡</span>
                             <div className="text-left">
-                              <p className="font-semibold text-blue-800">Quick Tip</p>
-                              <p className="text-blue-700 text-sm">Rate your overall mood right now, not how you want to feel.</p>
+                              <p className="font-semibold text-blue-800 dark:text-blue-100 ">Quick Tip</p>
+                              <p className="text-blue-700  dark:text-blue-100 text-sm">Rate your overall mood right now, not how you want to feel.</p>
                             </div>
                           </div>
                           <button
@@ -806,10 +806,10 @@ function MoodCheck() {
                       onClick={() => setCurrentStep(2)}
                       variant="primary"
                       size="lg"
-                      icon="➡️"
-                    >
-                      Continue to Emotions
+                      >
+                      Continue to Emotion 👉
                     </AnimatedButton>
+                    
                   </motion.div>
                 </div>
               </motion.div>
@@ -827,10 +827,12 @@ function MoodCheck() {
               >
                 <div>
                   <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                       What emotions are you experiencing?
                     </h2>
-                    <p className="text-gray-600">Select all that apply - it's okay to feel multiple emotions</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Select all that apply - it's okay to feel multiple emotions
+                    </p>
                     
                     {/* Voice Tip for Step 2 */}
                     {voiceMode && (
@@ -1050,7 +1052,10 @@ function MoodCheck() {
                       value={moodEntry.location}
                       onChange={(e) => setMoodEntry(prev => ({ ...prev, location: e.target.value }))}
                       placeholder="e.g., Home, Office, Park, Coffee Shop..."
-                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all text-center text-lg"
+                      className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl 
+                                 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 
+                                 focus:border-blue-500 transition-all text-center text-lg
+                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       whileFocus={{ scale: 1.02 }}
                     />
                   </motion.div>
@@ -1119,7 +1124,10 @@ function MoodCheck() {
                       value={moodEntry.notes}
                       onChange={(e) => setMoodEntry(prev => ({ ...prev, notes: e.target.value }))}
                       placeholder="What's happening in your life? What might be influencing your mood? How are you feeling about things? Share anything that feels relevant..."
-                      className="w-full p-6 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all resize-none text-lg leading-relaxed"
+                      className="w-full p-6 border-2 border-gray-200 dark:border-gray-700 rounded-xl 
+                                 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 
+                                 focus:border-blue-500 transition-all resize-none text-lg leading-relaxed
+                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       rows="6"
                       maxLength="2000"
                       whileFocus={{ scale: 1.01 }}
@@ -1212,7 +1220,9 @@ function MoodCheck() {
         <AnimatePresence>
           {analysis && !showCelebration && (
             <motion.div 
-              className="mt-12 p-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200 shadow-lg"
+              className="mt-12 p-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 
+                         dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 
+                         rounded-2xl border border-blue-200 dark:border-blue-800 shadow-lg"
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -30, scale: 0.95 }}
@@ -1349,7 +1359,9 @@ function MoodCheck() {
         <AnimatePresence>
           {recommendations.length > 0 && !showCelebration && (
             <motion.div 
-              className="mt-8 p-8 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl border border-green-200 shadow-lg"
+              className="mt-8 p-8 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 
+                         dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 
+                         rounded-2xl border border-green-200 dark:border-green-800 shadow-lg"
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -30, scale: 0.95 }}
@@ -1388,7 +1400,7 @@ function MoodCheck() {
                 {recommendations.map((rec, index) => (
                   <motion.div 
                     key={index} 
-                    className="flex items-start bg-white p-4 rounded-xl shadow-md border border-green-100"
+                    className="flex items-start bg-white p-4 rounded-xl shadow-md border border-green-100 dark:border-green-800"
                     variants={{
                       hidden: { opacity: 0, x: -20 },
                       visible: { opacity: 1, x: 0 }
@@ -1396,7 +1408,7 @@ function MoodCheck() {
                     whileHover={{ x: 5, scale: 1.02 }}
                   >
                     <span className="text-green-600 mr-4 mt-1 text-lg">•</span>
-                    <span className="flex-1 text-gray-700">{rec}</span>
+                    <span className="flex-1 text-gray-700 dark:text-gray-300">{rec}</span>
                   </motion.div>
                 ))}
               </motion.div>
