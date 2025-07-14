@@ -1,27 +1,23 @@
 """
-Enhanced AI Assistant with Safe Imports and Fixed Gemini Integration
+Enhanced AI Assistant with Safe Imports
 Author: Enthusiast-AD
 Date: 2025-07-07 12:37:18 UTC
 """
 
 import json
 import uuid
-import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 # Safe imports with fallbacks
 try:
-    from .gemini_service import gemini_service, GEMINI_AVAILABLE
-    logger.info("✅ Gemini service imported successfully")
+    from .gemini_service import gemini_service
+    GEMINI_AVAILABLE = True
+    print("✅ Gemini service imported successfully")
 except ImportError as e:
-    logger.warning(f"⚠️ Gemini service not available: {e}")
+    print(f"⚠️ Gemini service not available: {e}")
     GEMINI_AVAILABLE = False
     
     # Create fallback gemini service
@@ -41,9 +37,9 @@ except ImportError as e:
 try:
     from .enhanced_voice_processor import enhanced_voice_processor
     VOICE_PROCESSOR_AVAILABLE = True
-    logger.info("✅ Voice processor imported successfully")
+    print("✅ Voice processor imported successfully")
 except ImportError as e:
-    logger.warning(f"⚠️ Voice processor not available: {e}")
+    print(f"⚠️ Voice processor not available: {e}")
     VOICE_PROCESSOR_AVAILABLE = False
     
     # Create fallback voice processor
@@ -61,33 +57,22 @@ class EnhancedMentalHealthAssistant:
     def __init__(self):
         self.conversations = {}
         
-        # Crisis keywords (always use mental health logic)
-        self.crisis_keywords = [
-            'suicide', 'kill myself', 'hurt myself', 'end it all', 'want to die',
-            'better off dead', 'can\'t go on', 'no point in living', 'self harm',
-            'cutting', 'overdose', 'jump off'
-        ]
-        
-        # Mental health specific keywords
+        # Mental health specific keywords for routing
         self.mental_health_keywords = [
-            'depression', 'anxiety', 'panic attack', 'therapy', 'counseling',
-            'mental health', 'psychiatrist', 'medication', 'antidepressant',
-            'bipolar', 'ptsd', 'trauma', 'eating disorder', 'addiction',
-            'feel depressed', 'feel anxious', 'having panic', 'need therapy'
+            'mood', 'depression', 'anxiety', 'stress', 'panic', 'crisis',
+            'suicide', 'self-harm', 'therapy', 'counseling', 'mental health',
+            'feel sad', 'feel depressed', 'feel anxious', 'overwhelmed'
         ]
         
-        # General conversation keywords (prioritize Gemini)
+        # General conversation keywords for Gemini
         self.general_keywords = [
-            'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening',
-            'how are you', 'what are you doing', 'what\'s up', 'tell me about',
-            'what do you think', 'can you help', 'explain', 'what is',
-            'weather', 'news', 'joke', 'story', 'recipe', 'movie', 'book',
-            'music', 'game', 'sports', 'travel', 'hobby', 'fun fact'
+            'hello', 'hi', 'how are you', 'what are you doing', 'tell me about',
+            'what do you think', 'can you help', 'explain', 'what is'
         ]
 
     async def chat(self, user_message: str, user_id: int, db: Session, 
                    conversation_id: Optional[str] = None) -> Dict[str, Any]:
-        """Enhanced chat with fixed Gemini integration and smart routing"""
+        """Enhanced chat with Gemini integration and smart routing"""
         try:
             # Create or get conversation
             if not conversation_id or conversation_id not in self.conversations:
@@ -109,7 +94,7 @@ class EnhancedMentalHealthAssistant:
             # Get user mood history for context
             mood_history = await self._get_user_mood_context(user_id, db)
             
-            # Fixed routing logic - determine which service to use
+            # Determine if this should use Gemini or mental health specific logic
             response = await self._route_and_generate_response(user_message, mood_history)
             
             # Add AI response to conversation
@@ -134,68 +119,45 @@ class EnhancedMentalHealthAssistant:
             }
             
         except Exception as e:
-            logger.error(f"Error in enhanced AI chat: {e}")
+            print(f"Error in enhanced AI chat: {e}")
             return self._fallback_response(conversation_id, user_message)
 
     async def _route_and_generate_response(self, user_message: str, mood_history: List[Dict]) -> Dict[str, Any]:
-        """Fixed smart routing between Gemini and mental health specific responses"""
+        """Smart routing between Gemini and mental health specific responses"""
         message_lower = user_message.lower()
         
-        # PRIORITY 1: Crisis keywords - always use mental health crisis response
-        if any(keyword in message_lower for keyword in self.crisis_keywords):
-            logger.info("🚨 Crisis detected - using mental health crisis response")
+        # Check for crisis keywords first (always use mental health logic)
+        crisis_keywords = ['suicide', 'kill myself', 'hurt myself', 'end it all', 'want to die']
+        if any(keyword in message_lower for keyword in crisis_keywords):
             return await self._generate_crisis_response(user_message)
         
-        # PRIORITY 2: Explicit mental health keywords - use mental health specialized response
+        # Check for mental health specific content
         is_mental_health = any(keyword in message_lower for keyword in self.mental_health_keywords)
-        if is_mental_health:
-            logger.info("🧠 Mental health keywords detected - using specialized mental health response")
-            return await self._generate_mental_health_response(user_message, mood_history)
         
-        # PRIORITY 3: General conversation - try Gemini first (FIXED LOGIC)
+        # Check for general conversation
         is_general = any(keyword in message_lower for keyword in self.general_keywords)
-        if is_general and GEMINI_AVAILABLE and gemini_service.is_available():
-            logger.info("🤖 General conversation detected - using Gemini AI")
-            context = {
-                'mood_history': mood_history,
-                'user_type': 'mental_health_user',
-                'conversation_type': 'general'
-            }
-            try:
-                response = await gemini_service.generate_response(user_message, context)
-                logger.info(f"✅ Gemini response generated successfully (source: {response.get('source', 'unknown')})")
-                return response
-            except Exception as e:
-                logger.error(f"❌ Gemini error, falling back to mental health response: {e}")
-                return await self._generate_mental_health_response(user_message, mood_history)
         
-        # PRIORITY 4: Mood-aware responses - if user has mood history, enhance with context
-        if mood_history and len(mood_history) > 0:
-            logger.info("📊 Using mood-aware mental health response")
+        if is_mental_health or (mood_history and len(mood_history) > 0):
+            # Use our specialized mental health logic with mood context
             return await self._generate_mental_health_response(user_message, mood_history)
-        
-        # PRIORITY 5: Try Gemini for any remaining messages if available
-        if GEMINI_AVAILABLE and gemini_service.is_available():
-            logger.info("🤖 Attempting Gemini for unclassified message")
+        elif is_general and GEMINI_AVAILABLE and gemini_service.is_available():
+            # Use Gemini for general conversation with mental health context
             context = {
                 'mood_history': mood_history,
                 'user_type': 'mental_health_user',
                 'conversation_type': 'general'
             }
             try:
-                response = await gemini_service.generate_response(user_message, context)
-                logger.info(f"✅ Gemini fallback response generated (source: {response.get('source', 'unknown')})")
-                return response
+                return await gemini_service.generate_response(user_message, context)
             except Exception as e:
-                logger.error(f"❌ Gemini fallback error: {e}")
-        
-        # FINAL FALLBACK: Default mental health response
-        logger.info("🛡️ Using default mental health response")
-        return await self._generate_mental_health_response(user_message, mood_history)
+                print(f"Gemini error, falling back: {e}")
+                return await self._generate_mental_health_response(user_message, mood_history)
+        else:
+            # Fallback to our mental health responses
+            return await self._generate_mental_health_response(user_message, mood_history)
 
     async def _generate_crisis_response(self, user_message: str) -> Dict[str, Any]:
         """Generate immediate crisis response"""
-        logger.warning("🚨 Crisis response triggered")
         return {
             'content': "I'm very concerned about what you've shared. Your safety is the most important thing right now. Please reach out for immediate help:\n\n📞 **Call 988** (Suicide & Crisis Lifeline) - Available 24/7\n💬 **Text HOME to 741741** (Crisis Text Line)\n🆘 **Call 911** if you're in immediate danger\n\nYou don't have to go through this alone. There are people who want to help you through this difficult time. Your life has value and meaning. 💙",
             'tone': 'crisis_support',
@@ -317,7 +279,6 @@ I'm currently analyzing patterns from your mood tracking to give you the most re
 
     def _fallback_response(self, conversation_id: str, user_message: str) -> Dict[str, Any]:
         """Enhanced fallback response"""
-        logger.warning("🛡️ Using fallback response")
         return {
             'conversation_id': conversation_id or str(uuid.uuid4()),
             'response': {
@@ -353,7 +314,7 @@ I'm currently analyzing patterns from your mood tracking to give you the most re
             return mood_context
             
         except Exception as e:
-            logger.error(f"Error getting mood context: {e}")
+            print(f"Error getting mood context: {e}")
             return []
 
     async def _analyze_mood_patterns(self, mood_history: List[Dict]) -> Dict[str, Any]:
@@ -577,9 +538,4 @@ class MoodPatternAnalyzer:
 mental_health_assistant.mood_analyzer = MoodPatternAnalyzer()
 mental_health_assistant._generate_recommendations = mental_health_assistant._generate_contextual_recommendations
 
-# Log initialization status
-logger.info(f"✅ Enhanced Mental Health Assistant initialized")
-logger.info(f"🤖 Gemini AI Available: {GEMINI_AVAILABLE}")
-logger.info(f"🎙️ Voice Processor Available: {VOICE_PROCESSOR_AVAILABLE}")
-if GEMINI_AVAILABLE:
-    logger.info(f"🔗 Gemini Service Status: {gemini_service.is_available()}")
+print("✅ Enhanced Mental Health Assistant initialized with safe imports")

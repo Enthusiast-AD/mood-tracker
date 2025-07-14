@@ -7,7 +7,7 @@ import {
 } from 'chart.js'
 import { Doughnut } from 'react-chartjs-2'
 import { motion } from 'framer-motion'
-import { PieChart, Heart } from 'lucide-react'
+import { PieChart, Heart, TrendingUp, BarChart3, Activity } from 'lucide-react'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -26,7 +26,7 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
     }
 
     const emotionCounts = {}
-    
+
     moodHistory.forEach(entry => {
       if (entry.emotions && Array.isArray(entry.emotions)) {
         entry.emotions.forEach(emotion => {
@@ -37,8 +37,8 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
 
     // Convert to array and sort by count
     const emotionArray = Object.entries(emotionCounts)
-      .map(([emotion, count]) => ({ 
-        emotion, 
+      .map(([emotion, count]) => ({
+        emotion,
         count,
         color: getEmotionColor(emotion)
       }))
@@ -53,7 +53,7 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
   const getEmotionColor = (emotion) => {
     const colorMap = {
       'happy': '#10B981',
-      'sad': '#EF4444', 
+      'sad': '#EF4444',
       'anxious': '#F59E0B',
       'calm': '#3B82F6',
       'excited': '#8B5CF6',
@@ -103,7 +103,7 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
         borderWidth: 1,
         cornerRadius: 8,
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             const percentage = ((context.parsed / totalEntries) * 100).toFixed(1)
             return `${context.label}: ${context.parsed} (${percentage}%)`
           }
@@ -120,7 +120,7 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
     const emojiMap = {
       'happy': '😊',
       'sad': '😔',
-      'anxious': '😰', 
+      'anxious': '😰',
       'calm': '😌',
       'excited': '🤗',
       'angry': '😠',
@@ -138,43 +138,36 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
   }
 
   return (
-    <motion.div
-      className="bg-white rounded-xl p-6 shadow-lg border border-gray-100"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <PieChart className="w-5 h-5 text-purple-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-500">{totalEntries} total emotions tracked</p>
+    <div className=" w-1grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* Main Chart */}
+      <motion.div
+        className=" lg:col-span-3 bg-white rounded-xl p-6 shadow-lg border border-gray-100"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <PieChart className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+              <p className="text-sm text-gray-500">{totalEntries} total emotions tracked</p>
+            </div>
           </div>
         </div>
-        
-        <div className="text-right">
-          <p className="text-sm font-medium text-gray-700">Most Common</p>
-          <p className="text-lg font-bold text-purple-600">
-            {emotionData[0]?.emotion || 'N/A'}
-          </p>
-        </div>
-      </div>
 
-      {/* Chart and Legend Container */}
-      <div className="grid md:grid-cols-2 gap-6">
         {/* Chart */}
-        <div className="h-64 relative">
+        <div className="h-80 relative mb-6">
           {emotionData.length > 0 && emotionData[0].emotion !== 'No data' ? (
             <>
               <Doughnut data={data} options={options} />
               {/* Center Text */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-700">{totalEntries}</p>
+                  <p className="text-3xl font-bold text-gray-700">{totalEntries}</p>
                   <p className="text-sm text-gray-500">Total</p>
                 </div>
               </div>
@@ -190,55 +183,78 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
           )}
         </div>
 
-        {/* Custom Legend */}
-        <div className="space-y-2">
-          <h4 className="font-semibold text-gray-800 mb-3">Emotion Breakdown</h4>
-          <div className="space-y-2 max-h-52 overflow-y-auto">
-            {emotionData.map((item, index) => {
-              const percentage = ((item.count / totalEntries) * 100).toFixed(1)
-              return (
-                <motion.div
-                  key={item.emotion}
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-2xl">{getEmotionEmoji(item.emotion)}</span>
-                    <span className="font-medium text-gray-700 capitalize">
+        {/* Horizontal Emoji Section */}
+        <div className="border-t pt-4 dark:border-gray-700">
+          <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-3">Emotion Breakdown</h4>
+          <div className="overflow-x-auto">
+            <div className="flex space-x-4 pb-2 min-w-max">
+              {emotionData.map((item, index) => {
+                const percentage = ((item.count / totalEntries) * 100).toFixed(1)
+                return (
+                  <motion.div
+                    key={item.emotion}
+                    className="flex-shrink-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 min-w-32 text-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <div className="flex items-center justify-center mb-2">
+                      <div
+                        className="w-3 h-3 rounded-full mr-2 border border-gray-200 dark:border-gray-600"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-2xl">{getEmotionEmoji(item.emotion)}</span>
+                    </div>
+                    <p className="font-medium text-gray-700 dark:text-gray-200 capitalize text-sm mb-1">
                       {item.emotion}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-gray-900">{item.count}</p>
-                    <p className="text-xs text-gray-500">{percentage}%</p>
-                  </div>
-                </motion.div>
-              )
-            })}
+                    </p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100">{item.count}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</p>
+                  </motion.div>
+                )
+              })}
+            </div>
           </div>
         </div>
+      </motion.div>
+
+      {/* Side Widgets */}
+      <div className="space-y-6">
+        
+
+        
+        {/* {emotionData.length > 1 && emotionData[0].emotion !== 'No data' && (
+          <motion.div
+            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 shadow-lg border border-purple-100"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <h5 className="font-semibold text-purple-800 mb-3 flex items-center">
+              <span className="text-lg mr-2">🎭</span>
+              Insights
+            </h5>
+            <div className="text-sm text-purple-700 space-y-2">
+              <div className="flex items-start space-x-2">
+                <span className="text-purple-500 mt-1">•</span>
+                <p>
+                  <strong>{emotionData[0].emotion}</strong> dominates at {((emotionData[0].count / totalEntries) * 100).toFixed(1)}%
+                </p>
+              </div>
+              {emotionData.length > 1 && (
+                <div className="flex items-start space-x-2">
+                  <span className="text-purple-500 mt-1">•</span>
+                  <p>
+                    Good emotional range with <strong>{emotionData.length}</strong> different emotions
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )} */}
       </div>
 
-      {/* Insights */}
-      {emotionData.length > 1 && emotionData[0].emotion !== 'No data' && (
-        <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
-          <h5 className="font-semibold text-purple-800 mb-2">🎭 Emotion Insights</h5>
-          <div className="text-sm text-purple-700 space-y-1">
-            <p>• Your most frequent emotion is <strong>{emotionData[0].emotion}</strong> ({((emotionData[0].count / totalEntries) * 100).toFixed(1)}%)</p>
-            {emotionData.length > 1 && (
-              <p>• You experience <strong>{emotionData.length}</strong> different emotions regularly</p>
-            )}
-            <p>• Total emotional expressions tracked: <strong>{totalEntries}</strong></p>
-          </div>
-        </div>
-      )}
-    </motion.div>
+    </div>
   )
 }
 

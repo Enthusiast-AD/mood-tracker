@@ -290,24 +290,60 @@ const AIInsightsDashboard = () => {
   )
 }
 
+// Clean Insights Card
+const InsightsCard = ({ insights }) => (
+  <motion.div
+    className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3 }}
+  >
+    <div className="flex items-center space-x-2 mb-6">
+      <Sparkles className="w-5 h-5 text-purple-500" />
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AI Insights</h3>
+    </div>
+    
+    <div className="space-y-4">
+      {insights.length > 0 ? (
+        insights.map((insight, index) => (
+          <motion.div
+            key={index}
+            className="p-4 bg-gradient-to-r from-blue-50 to-indigo-30 dark:from-indigo-900 dark:to-indigo-850 rounded-lg border-l-4 border-blue-500"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <p className="text-blue-800 dark:text-blue-200 font-medium">{insight}</p>
+          </motion.div>
+        ))
+      ) : (
+        <div className="text-center py-8">
+          <Brain className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Track your mood to see AI insights</p>
+        </div>
+      )}
+    </div>
+  </motion.div>
+)
+
 // Clean Metric Card Component
 const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
   const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    green: 'from-green-500 to-green-600', 
-    red: 'from-red-500 to-red-600',
-    purple: 'from-purple-500 to-purple-600'
+    blue: 'from-blue-500 to-blue-600 dark:from-blue-800 dark:to-blue-900',
+    green: 'from-green-500 to-green-600 dark:from-green-800 dark:to-green-900', 
+    red: 'from-red-500 to-red-600 dark:from-red-800 dark:to-red-900',
+    purple: 'from-purple-500 to-purple-600 dark:from-purple-800 dark:to-purple-900'
   }
 
   const getTrendIcon = () => {
     if (trend === 'improving' || trend === 'up') return <TrendingUp className="w-4 h-4 text-green-500" />
     if (trend === 'declining' || trend === 'down') return <TrendingDown className="w-4 h-4 text-red-500" />
-    return <Minus className="w-4 h-4 text-gray-500" />
+    return <Minus className="w-4 h-4 text-gray-500 dark:text-gray-400" />
   }
 
   return (
     <motion.div
-      className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
@@ -319,9 +355,9 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
         {getTrendIcon()}
       </div>
       
-      <h3 className="text-sm font-medium text-gray-600 mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-sm text-gray-500">{subtitle}</p>
+      <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{title}</h3>
+      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{value}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>
     </motion.div>
   )
 }
@@ -329,64 +365,28 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
 // Clean Chart Card Component
 const ChartCard = ({ title, icon, data, type }) => (
   <motion.div
-    className="bg-white rounded-xl p-6 shadow-lg"
+    className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.2 }}
   >
     <div className="flex items-center space-x-2 mb-6">
       {icon}
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
     </div>
     
-    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+    <div className="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
       {type === 'trend' ? (
         <div className="text-center">
           <TrendingUp className="w-12 h-12 text-blue-500 mx-auto mb-2" />
-          <p className="text-gray-600">Mood trend visualization</p>
-          <p className="text-sm text-gray-500">{data?.length || 0} data points</p>
+          <p className="text-gray-600 dark:text-gray-300">Mood trend visualization</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{data?.length || 0} data points</p>
         </div>
       ) : (
         <div className="text-center">
           <PieChart className="w-12 h-12 text-green-500 mx-auto mb-2" />
-          <p className="text-gray-600">Emotion distribution</p>
-          <p className="text-sm text-gray-500">{data?.length || 0} emotions</p>
-        </div>
-      )}
-    </div>
-  </motion.div>
-)
-
-// Clean Insights Card
-const InsightsCard = ({ insights }) => (
-  <motion.div
-    className="bg-white rounded-xl p-6 shadow-lg"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.3 }}
-  >
-    <div className="flex items-center space-x-2 mb-6">
-      <Sparkles className="w-5 h-5 text-purple-500" />
-      <h3 className="text-lg font-semibold text-gray-900">AI Insights</h3>
-    </div>
-    
-    <div className="space-y-4">
-      {insights.length > 0 ? (
-        insights.map((insight, index) => (
-          <motion.div
-            key={index}
-            className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-blue-500"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <p className="text-blue-800 font-medium">{insight}</p>
-          </motion.div>
-        ))
-      ) : (
-        <div className="text-center py-8">
-          <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600">Track your mood to see AI insights</p>
+          <p className="text-gray-600 dark:text-gray-300">Emotion distribution</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{data?.length || 0} emotions</p>
         </div>
       )}
     </div>
@@ -396,30 +396,30 @@ const InsightsCard = ({ insights }) => (
 // Recent Moods Card
 const RecentMoodsCard = ({ moods }) => (
   <motion.div
-    className="bg-white rounded-xl p-6 shadow-lg"
+    className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.4 }}
   >
-    <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Moods</h3>
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Recent Moods</h3>
     
     <div className="space-y-3">
       {moods.length > 0 ? (
         moods.map((mood, index) => (
-          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <span className="text-2xl">
               {mood.score >= 7 ? '😊' : mood.score >= 4 ? '😐' : '😔'}
             </span>
             <div className="flex-1">
-              <p className="font-semibold">{mood.score}/10</p>
-              <p className="text-sm text-gray-500">
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{mood.score}/10</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date(mood.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
         ))
       ) : (
-        <p className="text-gray-500 text-center py-4">No recent entries</p>
+        <p className="text-gray-500 dark:text-gray-400 text-center py-4">No recent entries</p>
       )}
     </div>
   </motion.div>
@@ -428,7 +428,7 @@ const RecentMoodsCard = ({ moods }) => (
 // Quick Stats Card
 const QuickStatsCard = ({ analytics }) => (
   <motion.div
-    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl p-6 shadow-lg"
+    className="bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-900 dark:to-purple-900 text-white rounded-xl p-6 shadow-lg"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.5 }}

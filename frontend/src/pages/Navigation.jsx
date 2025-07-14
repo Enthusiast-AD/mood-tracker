@@ -3,21 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useContext, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
+import { Brain } from 'lucide-react'
 
-
-const Navigation=()=> {
-  const { theme, toggleTheme } = useTheme(); // ✅ THIS FIXES theme is not defined
-
+const Navigation = () => {
+  const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const { isAuthenticated, user, logout } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
-
+  // Scroll behavior state
+  const [isVisible, setIsVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
 
   const navItems = [
-    { path: '/', label: 'Home', emoji: '🏠', public: true },
-    { path: '/mood-check', label: 'Mood Check', emoji: '📝', protected: true },
-    { path: '/dashboard', label: 'Dashboard', emoji: '📊', protected: true },
+    { path: '/', label: 'Home', emoji: '', public: true },
+    { path: '/mood-check', label: 'Mood Check', emoji: '', protected: true },
+    { path: '/dashboard', label: 'Dashboard', emoji: '', protected: true },
     { path: '/crisis-support', label: 'Crisis Support', emoji: '🆘', public: true }
   ]
 
@@ -25,6 +26,48 @@ const Navigation=()=> {
     { path: '/auth/login', label: 'Sign In', emoji: '🔑' },
     { path: '/auth/register', label: 'Sign Up', emoji: '✨' }
   ]
+
+  // Handle scroll behavior
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const scrollThreshold = 10 // Minimum scroll distance to trigger hide/show
+
+      if (currentScrollY < scrollThreshold) {
+        // Always show navbar when near top
+        setIsVisible(true)
+      } else if (currentScrollY > lastScrollY && currentScrollY > scrollThreshold) {
+        // Scrolling down - hide navbar
+        setIsVisible(false)
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show navbar
+        setIsVisible(true)
+      }
+
+      setLastScrollY(currentScrollY)
+    }
+
+    const throttledHandleScroll = throttle(handleScroll, 100)
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll)
+    }
+  }, [lastScrollY])
+
+  // Throttle function to improve performance
+  const throttle = (func, limit) => {
+    let inThrottle
+    return function () {
+      const args = arguments
+      const context = this
+      if (!inThrottle) {
+        func.apply(context, args)
+        inThrottle = true
+        setTimeout(() => inThrottle = false, limit)
+      }
+    }
+  }
 
   const isActive = (path) => {
     if (path === '/' && location.pathname === '/') return true
@@ -37,34 +80,66 @@ const Navigation=()=> {
     setShowUserMenu(false)
   }
 
-
   return (
     <motion.nav
-      className="bg-white shadow-lg border-b border-gray-100"
+      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-100 transition-all duration-300 dark:bg-gray-800 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
       initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      animate={{ y: isVisible ? 0 : -100 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <motion.span
-              className="text-3xl"
-              whileHover={{
-                scale: 1.2,
-                rotate: [0, -10, 10, -10, 0]
-              }}
-              transition={{ duration: 0.6 }}
+
+
+            <motion.div 
+            className=" relative flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
             >
-              🧠
-            </motion.span>
-            <motion.span
-              className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
+              <motion.div
+                className="p-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg"
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                <Brain className="w-6 h-6 text-white" />
+              </motion.div>
+            </motion.div>
+
+            <motion.h2
+              className="relative text-2xl font-bold overflow-hidden justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 1.2 }}
             >
-              Mental Health AI
-            </motion.span>
+              {/* Base gradient text */}
+              <span className="inline-block bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Mental Health AI
+              </span>
+
+              {/* Smooth shimmer effect */}
+              <motion.span
+                className="absolute inset-0 bg-clip-text text-transparent"
+                style={{
+                  backgroundSize: '200% 100%',
+                  backgroundImage: 'linear-gradient(90deg, transparent 0%, transparent 45%, rgba(255, 255, 255, 0.9) 50%, transparent 55%, transparent 100%)'
+                }}
+                animate={{
+                  backgroundPosition: ['200% 0', '-200% 0']
+                }}
+                transition={{
+                  duration: 8,
+                  ease: "linear",
+                  repeat: Infinity,
+                  repeatType: "loop"
+                }}
+              >
+                Mental Health AI
+              </motion.span>
+            </motion.h2>
           </Link>
 
           {/* Navigation Items */}
@@ -101,6 +176,11 @@ const Navigation=()=> {
 
           {/* Auth Section */}
           <div className="flex items-center space-x-2">
+            {/* Theme Toggle Button */}
+            <button onClick={toggleTheme} className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:opacity-80 transition">
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </button>
+
             {isAuthenticated ? (
               /* User Menu */
               <div className="relative">
@@ -184,12 +264,9 @@ const Navigation=()=> {
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Theme Toggle Button */}
-          <button onClick={toggleTheme} className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:opacity-80 transition">
-            {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
-          </button>
+
+          </div>
         </div>
 
         {/* Mobile Navigation */}
