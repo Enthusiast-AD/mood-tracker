@@ -165,14 +165,14 @@ const LoginPage = () => {
             💡 Demo Credentials
           </h3>
           <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-            <p><strong>Username:</strong> user_AItest</p>
+            <p><strong>Username:</strong> aitest_user</p>
             <p><strong>Password:</strong> password123</p>
           </div>
           <button
             type="button"
             onClick={() => {
               setFormData({
-                username: 'user_AItest',
+                username: 'aitest_user',
                 password: 'password123'
               })
             }}
