@@ -3,7 +3,26 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useContext, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { Brain, Moon, Sun, User, HelpCircle, Lock, Star, UserPlus, LogIn, AlertCircle } from 'lucide-react'
+import { 
+  Brain, 
+  Moon, 
+  Sun, 
+  User, 
+  HelpCircle, 
+  Lock, 
+  Star, 
+  UserPlus, 
+  LogIn, 
+  AlertCircle,
+  BarChart2,
+  ClipboardList,
+  ChevronDown,
+  LogOut,
+  Home,
+  Settings,
+  BookOpen,
+  MessageSquare
+} from 'lucide-react'
 
 const Navigation = () => {
   const { theme, toggleTheme } = useTheme()
@@ -16,15 +35,15 @@ const Navigation = () => {
   const [lastScrollY, setLastScrollY] = useState(0)
 
   const navItems = [
-    { path: '/', label: 'Home', emoji: '', public: true },
-    { path: '/mood-check', label: 'Mood Check', emoji: '', protected: true },
-    { path: '/dashboard', label: 'Dashboard', emoji: '', protected: true },
-    { path: '/crisis-support', label: 'Crisis Support', emoji: <AlertCircle className='text-red-500'  />, public: true }
+    { path: '/', label: 'Home', icon: <Home size={18} />, public: true },
+    { path: '/mood-check', label: 'Mood Check', icon: <ClipboardList size={18} />, protected: true },
+    { path: '/dashboard', label: 'Dashboard', icon: <BarChart2 size={18} />, protected: true },
+    { path: '/crisis-support', label: 'Crisis Support', icon: <AlertCircle size={18} className='text-red-500' />, public: true }
   ]
 
   const authItems = [
-    { path: '/auth/login', label: 'Sign In', emoji: <LogIn /> },
-    { path: '/auth/register', label: 'Sign Up', emoji: <UserPlus /> }
+    { path: '/auth/login', label: 'Sign In', icon: <LogIn size={18} /> },
+    { path: '/auth/register', label: 'Sign Up', icon: <UserPlus size={18} /> }
   ]
 
   // Handle scroll behavior
@@ -82,8 +101,9 @@ const Navigation = () => {
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-100 transition-all duration-300 dark:bg-gray-800 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-slate-100 transition-all duration-300 dark:bg-slate-800/90 dark:border-slate-700 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
       initial={{ y: -100 }}
       animate={{ y: isVisible ? 0 : -100 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -93,16 +113,14 @@ const Navigation = () => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-
-
             <motion.div 
-            className=" relative flex items-center justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
+              className="relative flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
             >
               <motion.div
-                className="p-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg"
+                className="p-2 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl shadow-lg"
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               >
                 <Brain className="w-6 h-6 text-white" />
@@ -116,7 +134,7 @@ const Navigation = () => {
               transition={{ delay: 0.3, duration: 1.2 }}
             >
               {/* Base gradient text */}
-              <span className="inline-block bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">
                 Mental Health AI
               </span>
 
@@ -152,20 +170,20 @@ const Navigation = () => {
                 <motion.div key={item.path} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to={item.path}
-                    className={`px-4 py-2 rounded-lg text-md font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
-                      ? 'bg-blue-500 dark:bg-blue-800 text-white dark:text-slate-50 shadow-lg'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                      }`}
+                    className={`px-4 py-2 rounded-lg text-md font-medium transition-all duration-200 flex items-center space-x-2 ${
+                      isActive(item.path)
+                        ? 'bg-blue-600 dark:bg-blue-800 text-white dark:text-slate-50 shadow-lg'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700'
+                    }`}
                   >
                     <motion.span
-                      className="text-lg"
                       animate={isActive(item.path) ? {
                         scale: [1, 1.2, 1],
                         rotate: [0, 10, -10, 0]
                       } : {}}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      {item.emoji}
+                      {item.icon}
                     </motion.span>
                     <span className="hidden lg:inline">{item.label}</span>
                   </Link>
@@ -177,68 +195,86 @@ const Navigation = () => {
           {/* Auth Section */}
           <div className="flex items-center space-x-2">
             {/* Theme Toggle Button */}
-            <button onClick={toggleTheme} className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:opacity-80 transition">
-              {theme === 'dark' ? <Moon /> : <Sun className='text-yellow-500'/>}
-            </button>
+            <motion.button 
+              onClick={toggleTheme} 
+              className="p-2 rounded-md bg-slate-200 dark:bg-slate-700 hover:opacity-80 transition"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {theme === 'dark' ? (
+                <Moon className="text-blue-400" />
+              ) : (
+                <Sun className="text-yellow-500" />
+              )}
+            </motion.button>
 
             {isAuthenticated ? (
               /* User Menu */
               <div className="relative">
                 <motion.button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span className="text-lg"><User /></span>
+                  <User size={18} />
                   <span className="hidden sm:inline">{user?.username || 'User'}</span>
                   <motion.span
                     animate={{ rotate: showUserMenu ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    ▼
+                    <ChevronDown size={16} />
                   </motion.span>
                 </motion.button>
 
                 <AnimatePresence>
                   {showUserMenu && (
                     <motion.div
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
+                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-100 dark:border-slate-700 py-2 z-50"
                       initial={{ opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-700">{user?.full_name || user?.username}</p>
-                        <p className="text-xs text-gray-500">{user?.email}</p>
+                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{user?.full_name || user?.username}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{user?.email}</p>
                       </div>
 
                       <Link
                         to="/dashboard"
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
-                        <span>📊</span>
+                        <BarChart2 size={16} />
                         <span>Dashboard</span>
                       </Link>
 
                       <Link
                         to="/mood-check"
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
-                        <span>📝</span>
+                        <ClipboardList size={16} />
                         <span>Track Mood</span>
                       </Link>
 
-                      <hr className="my-2" />
+                      <Link
+                        to="/settings"
+                        className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 hover:text-blue-600 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <Settings size={16} />
+                        <span>Settings</span>
+                      </Link>
+
+                      <hr className="my-2 border-slate-100 dark:border-slate-700" />
 
                       <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700 transition-colors"
                       >
-                        <span>🚪</span>
+                        <LogOut size={16} />
                         <span>Sign Out</span>
                       </button>
                     </motion.div>
@@ -252,20 +288,19 @@ const Navigation = () => {
                   <motion.div key={item.path} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                       to={item.path}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${item.path === '/auth/login'
-                        ? 'text-blue-600 hover:bg-blue-50 border border-blue-200'
-                        : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:shadow-xl'
-                        }`}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                        item.path === '/auth/login'
+                          ? 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 border border-blue-200 dark:border-slate-600'
+                          : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl'
+                      }`}
                     >
-                      <span className="text-lg">{item.emoji}</span>
+                      {item.icon}
                       <span className="hidden sm:inline">{item.label}</span>
                     </Link>
                   </motion.div>
                 ))}
               </div>
             )}
-
-
           </div>
         </div>
 
@@ -279,12 +314,13 @@ const Navigation = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                    }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                    isActive(item.path)
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700'
+                  }`}
                 >
-                  <span className="text-lg">{item.emoji}</span>
+                  {item.icon}
                   <span className="text-xs">{item.label}</span>
                 </Link>
               )

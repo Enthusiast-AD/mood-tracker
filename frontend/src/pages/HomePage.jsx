@@ -2,43 +2,60 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { 
+  LineChart, 
+  Shield, 
+  Smartphone, 
+  AlertTriangle, 
+  BarChart2, 
+  Bot,
+  Smile,
+  Target,
+  Zap,
+  ShieldCheck,
+  Heart,
+  HelpCircle,
+  BookOpen,
+  Mail,
+  Info
+} from 'lucide-react'
 
 function HomePage() {
   const { isAuthenticated } = useAuth()
 
   const features = [
     {
-      icon: '📊',
+      icon: <BarChart2 size={24} />,
       title: 'AI-Powered Mood Tracking',
       description: 'Track your daily emotions with advanced AI analysis and sentiment detection',
       color: 'from-blue-500 to-cyan-500'
     },
     {
-      icon: '🤖',
+      icon: <Bot size={24} />,
       title: 'Smart Insights',
       description: 'Get personalized recommendations and pattern recognition from your mood data',
       color: 'from-purple-500 to-pink-500'
     },
     {
-      icon: '🆘',
+      icon: <AlertTriangle size={24} />,
       title: 'Crisis Support',
       description: 'Immediate help and resources available 24/7 when you need them most',
       color: 'from-red-500 to-orange-500'
     },
     {
-      icon: '📈',
+      icon: <LineChart size={24} />,
       title: 'Beautiful Analytics',
       description: 'Visualize your mental health journey with stunning charts and trends',
       color: 'from-green-500 to-teal-500'
     },
     {
-      icon: '🛡️',
+      icon: <ShieldCheck size={24} />,
       title: 'Privacy & Security',
       description: 'Your mental health data is encrypted and completely private',
       color: 'from-indigo-500 to-purple-500'
     },
     {
-      icon: '📱',
+      icon: <Smartphone size={24} />,
       title: 'Works Everywhere',
       description: 'Progressive Web App that works on all devices, online and offline',
       color: 'from-yellow-500 to-orange-500'
@@ -98,10 +115,10 @@ function HomePage() {
   }
 
   const moodCards = [
-    { emoji: "😊", label: "Happy", color: "from-blue-500 to-purple-600" },
-    { emoji: "🎯", label: "Focused", color: "from-pink-500 to-orange-500" },
-    { emoji: "🌟", label: "Motivated", color: "from-green-500 to-teal-500" },
-    { emoji: "💪", label: "Strong", color: "from-indigo-500 to-purple-500" }
+    { emoji: <Smile size={28} />, label: "Happy", color: "from-blue-500 to-purple-600" },
+    { emoji: <Target size={28} />, label: "Focused", color: "from-pink-500 to-orange-500" },
+    { emoji: <Zap size={28} />, label: "Motivated", color: "from-green-500 to-teal-500" },
+    { emoji: <Heart size={28} />, label: "Strong", color: "from-indigo-500 to-purple-500" }
   ];
 
   // Helper to get random position/rotation
@@ -148,7 +165,7 @@ function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
             >
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
+              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-50 leading-tight">
                 Your Mental Health
                 <motion.h2
                   className="relative text-6xl font-bold overflow-hidden justify-center"
@@ -157,7 +174,7 @@ function HomePage() {
                   transition={{ delay: 0.3, duration: 1.2 }}
                 >
                   {/* Base gradient text */}
-                  <span className="inline-block bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  <span className="inline-block bg-gradient-to-r from-blue-500 via-blue-600 to-blue-800 dark:from-blue-400 dark:via-blue-500 dark:to-blue-700 bg-clip-text text-transparent">
                     Companion
                   </span>
 
@@ -183,7 +200,7 @@ function HomePage() {
                 </motion.h2>
               </h1>
 
-              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg">
+              <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg">
                 AI-powered mood tracking and mental wellness insights designed to help you understand and improve your emotional well-being.
               </p>
 
@@ -199,18 +216,18 @@ function HomePage() {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Link
                         to="/mood-check"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-3"
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-3"
                       >
-                        <span className="text-xl">📝</span>
+                        <BarChart2 className="w-5 h-5" />
                         <span>Track Your Mood</span>
                       </Link>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Link
                         to="/dashboard"
-                        className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 border-2 border-gray-200 dark:border-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center space-x-3"
+                        className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-100 border-2 border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 flex items-center space-x-3"
                       >
-                        <span className="text-xl">📊</span>
+                        <LineChart className="w-5 h-5" />
                         <span>View Dashboard</span>
                       </Link>
                     </motion.div>
@@ -220,18 +237,18 @@ function HomePage() {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Link
                         to="/auth/register"
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-3"
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-3"
                       >
-                        <span className="text-xl">✨</span>
+                        <Zap className="w-5 h-5" />
                         <span>Get Started</span>
                       </Link>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Link
                         to="/mood-check"
-                        className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 border-2 border-gray-200 dark:border-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center space-x-3"
+                        className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-100 border-2 border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 flex items-center space-x-3"
                       >
-                        <span className="text-xl">👀</span>
+                        <Info className="w-5 h-5" />
                         <span>Try Demo</span>
                       </Link>
                     </motion.div>
@@ -246,43 +263,41 @@ function HomePage() {
               variants={containerVariants}
             >
               <motion.div
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-800"
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-100 dark:border-slate-700"
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="text-3xl font-bold text-blue-600 mb-2">
+                <div className="text-3xl font-bold text-blue-500 dark:text-blue-400 mb-2">
                   AI-Powered
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Advanced sentiment analysis</p>
+                <p className="text-slate-600 dark:text-slate-300 text-sm">Advanced sentiment analysis</p>
               </motion.div>
 
               <motion.div
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-800"
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-100 dark:border-slate-700"
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-500 mb-2">
                   24/7
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Crisis support available</p>
+                <p className="text-slate-600 dark:text-slate-300 text-sm">Crisis support available</p>
               </motion.div>
 
               <motion.div
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-800"
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-100 dark:border-slate-700"
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="text-3xl font-bold text-purple-600 mb-2">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-500 mb-2">
                   Secure
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Privacy-first approach</p>
+                <p className="text-slate-600 dark:text-slate-300 text-sm">Privacy-first approach</p>
               </motion.div>
             </motion.div>
-
-
           </motion.div>
 
           {/* Right Side - Full Image with Floating Cards */}
@@ -329,7 +344,7 @@ function HomePage() {
             transition={{ delay: 0.3, duration: 0.8 }}
           >
             <motion.span
-              className="inline-block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-600 dark:bg-gradient-to-r dark:from-blue-400 dark:via-purple-400 dark:to-pink-400  bg-clip-text text-transparent"
+              className="inline-block bg-gradient-to-r from-blue-500 via-blue-600 to-blue-800 dark:from-blue-400 dark:via-blue-500 dark:to-blue-700 bg-clip-text text-transparent"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -346,7 +361,7 @@ function HomePage() {
             </motion.span>
           </motion.h2>
           <motion.p
-            className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+            className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
@@ -359,7 +374,7 @@ function HomePage() {
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              className="bg-white dark:bg-slate-800 shadow-lg rounded-2xl p-8 border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-all duration-300"
               variants={itemVariants}
               whileHover={{
                 y: -8,
@@ -368,7 +383,7 @@ function HomePage() {
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-2xl mb-6`}
+                className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6`}
                 whileHover={{
                   scale: 1.1,
                   rotate: 5
@@ -378,11 +393,11 @@ function HomePage() {
                 {feature.icon}
               </motion.div>
 
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
+              <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
                 {feature.title}
               </h3>
 
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
@@ -392,7 +407,7 @@ function HomePage() {
 
       {/* CTA Section */}
       <motion.div
-        className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 relative overflow-hidden"
+        className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.8 }}
@@ -429,9 +444,9 @@ function HomePage() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   to="/mood-check"
-                  className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
+                  className="bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
                 >
-                  <span className="text-xl">🚀</span>
+                  <Zap className="w-5 h-5" />
                   <span>Continue Your Journey</span>
                 </Link>
               </motion.div>
@@ -440,17 +455,17 @@ function HomePage() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/auth/register"
-                    className="bg-white dark:bg-gray-400 text-blue-600 dark:text-blue-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
+                    className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center space-x-3"
                   >
-                    <span className="text-xl">Start Free Today</span>
+                    <span>Start Free Today</span>
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to="/mood-check"
-                    className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-200 transition-all duration-300 inline-flex items-center space-x-3"
+                    className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 inline-flex items-center space-x-3"
                   >
-                    <span className="text-xl">👀</span>
+                    <Info className="w-5 h-5" />
                     <span>Try Demo</span>
                   </Link>
                 </motion.div>
@@ -459,45 +474,47 @@ function HomePage() {
           </motion.div>
         </div>
       </motion.div>
-      {/* footer */}
-      <footer className=" bg-gray-100 text-gray-800 py-8 mt-16 dark:bg-gray-900 dark:text-gray-400 ">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 dark:text-gray-400">
+      
+      {/* Footer */}
+      <footer className="bg-slate-100 text-slate-800 py-8 mt-16 dark:bg-slate-900 dark:text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
           <div className="flex flex-col sm:flex-row justify-between items-center">
-            <Link to="/privacy" className="text-gray-800 text-sm dark:text-gray-200">Privacy Policy</Link>
+            <Link to="/privacy" className="text-slate-800 text-sm dark:text-slate-200">Privacy Policy</Link>
             <span className="mx-2">|</span>
-            <Link to="/terms" className="text-gray-800 text-sm dark:text-gray-200">Terms of Service</Link>
+            <Link to="/terms" className="text-slate-800 text-sm dark:text-slate-200">Terms of Service</Link>
             <span className="mx-2">|</span>
-            <Link to="/contact" className="text-gray-800 text-sm dark:text-gray-200">Contact Us</Link>
+            <Link to="/contact" className="text-slate-800 text-sm dark:text-slate-200">Contact Us</Link>
           </div>
 
-
-          <div className="mt-4">
-            <Link to="/about" className="text-gray-800 text-sm dark:text-gray-200">About Us</Link>
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <Link to="/about" className="text-slate-800 text-sm dark:text-slate-200">About Us</Link>
             <span className="mx-2">|</span>
-            <Link to="/blog" className="text-gray-800 text-sm dark:text-gray-200">Blog</Link>
+            <Link to="/blog" className="text-slate-800 text-sm dark:text-slate-200">Blog</Link>
             <span className="mx-2">|</span>
-            <Link to="/help" className="text-gray-800 text-sm dark:text-gray-200">Help Center</Link>
-
-            <div className="ml-auto">
-              <Link to="/faq" className="text-gray-800 dark:text-gray-200 text-sm">FAQ</Link>
-              <span className="mx-2">|</span>
-              <Link to="/support" className="text-gray-800 dark:text-gray-200 text-sm">Support</Link>
-            </div>
+            <Link to="/help" className="text-slate-800 text-sm dark:text-slate-200">
+              <HelpCircle className="inline w-4 h-4 mr-1" />
+              Help Center
+            </Link>
           </div>
 
-
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <Link to="/faq" className="text-slate-800 text-sm dark:text-slate-200">FAQ</Link>
+            <span className="mx-2">|</span>
+            <Link to="/support" className="text-slate-800 text-sm dark:text-slate-200">
+              <Mail className="inline w-4 h-4 mr-1" />
+              Support
+            </Link>
+          </div>
         </div>
 
-
-
-        <div className="max-w-7xl mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center mt-8">
           <p className="text-sm">&copy; {new Date().getFullYear()} Mood Tracker. All rights reserved.</p>
-          <p className="text-xs mt-2">Made with ❤️</p>
+          <p className="text-xs mt-2 flex items-center justify-center">
+            Made with <Heart className="w-4 h-4 mx-1 text-red-500 fill-red-500" /> for better mental health
+          </p>
         </div>
-
       </footer>
     </div>
-
   )
 }
 

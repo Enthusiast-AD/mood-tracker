@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react'
+import { 
+  Phone, MessageSquare, AlertCircle, Shield, Users, 
+  HeartPulse, Brain, AlertTriangle, ChevronDown, ChevronUp,
+  Cloud, LifeBuoy, CircleDot, ListChecks, CalendarCheck
+} from 'lucide-react'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -79,146 +84,159 @@ function CrisisSupport() {
     return (
       <div className="max-w-4xl mx-auto flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading crisis support resources...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-300">Loading crisis support resources...</p>
         </div>
       </div>
     )
   }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-16">
-      {/* Hero Section with Animated Clouds */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 pt-12 pb-20 text-center relative z-10">
-          <div className="inline-block bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 bg-clip-text text-transparent animate-gradient">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-800/10 dark:from-blue-800/20 dark:to-blue-900/30">
+        <div className="max-w-4xl mx-auto px-4 pt-16 pb-20 text-center relative z-10">
+          <div className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent animate-gradient">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
               Crisis Support
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-200 mb-6">
+          <p className="text-lg md:text-xl text-slate-700 dark:text-slate-200 mb-6">
             If you're having thoughts of self-harm or suicide, you're not alone.<br />
             Help is available 24/7. Your safety matters.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
             <button
               onClick={() => handleEmergencyCall('988')}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all duration-300 flex items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-800 dark:hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              <span>📞</span>
+              <Phone className="w-5 h-5" />
               <span>Call 988 Now</span>
             </button>
             <button
               onClick={handleCrisisChat}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all duration-300 flex items-center space-x-2"
+              className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              <span>💬</span>
+              <MessageSquare className="w-5 h-5" />
               <span>Start Crisis Chat</span>
             </button>
             <button
               onClick={() => handleEmergencyCall('911')}
-              className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all duration-300 flex items-center space-x-2"
+              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              <span>🚨</span>
-              <span>Call 911 (Emergency)</span>
+              <AlertCircle className="w-5 h-5" />
+              <span>Emergency (911)</span>
             </button>
           </div>
         </div>
-        {/* Animated SVG Clouds */}
-        <svg
-          width="100%"
-          height="220"
-          viewBox="0 0 800 220"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="absolute left-0 top-0 w-full h-[220px] pointer-events-none z-0"
-        >
-          <ellipse cx="120" cy="160" rx="90" ry="45" fill="#3B82F6" opacity="0.18" />
-          <ellipse cx="320" cy="100" rx="110" ry="60" fill="#8B5CF6" opacity="0.14" />
-          <ellipse cx="600" cy="170" rx="80" ry="38" fill="#EC4899" opacity="0.16" />
-          <ellipse cx="250" cy="200" rx="60" ry="25" fill="#fff" opacity="0.13" className="dark:opacity-0" />
-          <ellipse cx="500" cy="210" rx="50" ry="20" fill="#374151" opacity="0.13" className="hidden dark:block" />
-        </svg>
+        
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden opacity-20 dark:opacity-30">
+          <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl"></div>
+          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 space-y-12 relative z-10">
-        {/* Loading Spinner */}
-        {isLoading && (
-          <div className="flex items-center justify-center min-h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">Loading crisis support resources...</p>
-            </div>
-          </div>
-        )}
-
+      <div className="max-w-6xl mx-auto px-4 space-y-8">
         {!isLoading && (
           <>
             {/* Immediate Help & Specialized Support */}
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-6">
               {/* Immediate Help */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold mb-6 text-red-700 dark:text-red-400 flex items-center gap-2">
-                  🚨 Immediate Help (24/7)
-                </h2>
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                    <AlertCircle className="w-6 h-6 text-red-500 dark:text-red-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    Immediate Help (24/7)
+                  </h2>
+                </div>
                 <div className="space-y-4">
                   {resources?.immediate_help?.map((resource, index) => (
-                    <div key={index} className="border-l-4 border-red-500 pl-4 py-3 bg-red-50 dark:bg-red-900/20 rounded">
-                      <h3 className="font-bold text-lg text-red-800 dark:text-red-300">{resource.name}</h3>
+                    <div key={index} className="border-l-4 border-red-500 pl-4 py-3 bg-red-50 dark:bg-red-900/10 rounded">
+                      <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{resource.name}</h3>
                       <button
                         onClick={() => handleEmergencyCall(resource.phone.replace(/[^\d]/g, ''))}
-                        className="text-2xl font-bold text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 my-2 block"
+                        className="text-xl font-bold text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 my-2 flex items-center gap-2"
                       >
+                        <Phone className="w-4 h-4" />
                         {resource.phone}
                       </button>
-                      <p className="text-gray-700 dark:text-gray-200">{resource.description}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Available {resource.available}</p>
+                      <p className="text-slate-700 dark:text-slate-300">{resource.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mt-1">
+                        <CalendarCheck className="w-4 h-4" />
+                        <span>Available {resource.available}</span>
+                      </div>
                       {resource.languages && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Languages: {resource.languages.join(', ')}
-                        </p>
+                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mt-1">
+                          <span>🌐 Languages: {resource.languages.join(', ')}</span>
+                        </div>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
+              
               {/* Specialized Support */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold mb-6 text-blue-700 dark:text-blue-400 flex items-center gap-2">
-                  🤝 Specialized Support
-                </h2>
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <Users className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    Specialized Support
+                  </h2>
+                </div>
                 <div className="space-y-4">
                   {resources?.specialized_support?.map((resource, index) => (
-                    <div key={index} className="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded">
-                      <h3 className="font-bold text-lg text-blue-800 dark:text-blue-300">{resource.name}</h3>
+                    <div key={index} className="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50 dark:bg-blue-900/10 rounded">
+                      <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{resource.name}</h3>
                       <button
                         onClick={() => handleEmergencyCall(resource.phone.replace(/[^\d]/g, ''))}
-                        className="text-xl font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 my-2 block"
+                        className="text-xl font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 my-2 flex items-center gap-2"
                       >
+                        <Phone className="w-4 h-4" />
                         {resource.phone}
                       </button>
-                      <p className="text-gray-700 dark:text-gray-200">{resource.description}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Available {resource.available}</p>
+                      <p className="text-slate-700 dark:text-slate-300">{resource.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mt-1">
+                        <CalendarCheck className="w-4 h-4" />
+                        <span>Available {resource.available}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
+                
                 {/* Online Resources */}
-                <div className="mt-6">
-                  <h3 className="font-semibold mb-3 text-blue-700 dark:text-blue-300">💻 Online Resources</h3>
-                  <div className="space-y-2">
+                <div className="mt-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                      <LifeBuoy className="w-6 h-6 text-green-500 dark:text-green-400" />
+                    </div>
+                    <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-100">Online Resources</h3>
+                  </div>
+                  <div className="space-y-3">
                     <button
                       onClick={handleCrisisChat}
-                      className="w-full bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-800 p-3 rounded-lg text-left transition-colors"
+                      className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 p-4 rounded-lg text-left transition-colors flex items-center gap-3"
                     >
-                      <div className="font-semibold">Crisis Chat</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Online crisis chat support</div>
+                      <MessageSquare className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                      <div>
+                        <div className="font-semibold">Crisis Chat</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-300">Online crisis chat support</div>
+                      </div>
                     </button>
                     <button
                       onClick={() => window.open('https://www.crisistextline.org/', '_blank')}
-                      className="w-full bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-800 p-3 rounded-lg text-left transition-colors"
+                      className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 p-4 rounded-lg text-left transition-colors flex items-center gap-3"
                     >
-                      <div className="font-semibold">Crisis Text Line</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-300">Learn more about text support</div>
+                      <MessageSquare className="w-5 h-5 text-green-500 dark:text-green-400" />
+                      <div>
+                        <div className="font-semibold">Crisis Text Line</div>
+                        <div className="text-sm text-slate-600 dark:text-slate-300">Learn more about text support</div>
+                      </div>
                     </button>
                   </div>
                 </div>
@@ -226,34 +244,51 @@ function CrisisSupport() {
             </div>
 
             {/* Safety Planning */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-green-700 dark:text-green-400 flex items-center gap-2">
-                  🛡️ Safety Planning
-                </h2>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                    <Shield className="w-6 h-6 text-green-500 dark:text-green-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                    Safety Planning
+                  </h2>
+                </div>
                 <button
                   onClick={() => setShowSafetyPlan(!showSafetyPlan)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                 >
-                  {showSafetyPlan ? 'Hide' : 'Show'} Safety Plan
+                  {showSafetyPlan ? (
+                    <>
+                      <ChevronUp className="w-5 h-5" />
+                      <span>Hide Plan</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-5 h-5" />
+                      <span>Show Plan</span>
+                    </>
+                  )}
                 </button>
               </div>
+              
               {showSafetyPlan && (
-                <div className="space-y-4">
-                  <p className="text-gray-700 dark:text-gray-200 mb-4">
+                <div className="space-y-6">
+                  <p className="text-slate-700 dark:text-slate-300">
                     A safety plan is a personalized, practical plan to help you stay safe during a crisis.
                     Work through these steps:
                   </p>
+                  
                   <div className="grid md:grid-cols-2 gap-4">
                     {resources?.safety_planning?.steps?.map((step, index) => (
-                      <div key={index} className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-700/40">
-                        <div className="flex items-start">
-                          <div className="bg-green-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3 mt-1">
+                      <div key={index} className="bg-green-50 dark:bg-green-900/10 p-4 rounded-lg border border-green-200 dark:border-green-800/40">
+                        <div className="flex items-start gap-3">
+                          <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mt-1 flex-shrink-0">
                             {index + 1}
                           </div>
                           <div>
-                            <h4 className="font-semibold mb-2 text-green-800 dark:text-green-300">{step}</h4>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <h4 className="font-semibold mb-2 text-slate-800 dark:text-slate-100">{step}</h4>
+                            <div className="text-sm text-slate-600 dark:text-slate-400">
                               {getSafetyPlanDetails(step)}
                             </div>
                           </div>
@@ -261,100 +296,206 @@ function CrisisSupport() {
                       </div>
                     ))}
                   </div>
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/40 p-4 rounded-lg mt-6">
-                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">💡 Important Reminders</h4>
-                    <ul className="text-sm text-yellow-700 dark:text-yellow-200 space-y-1">
-                      <li>• Keep your safety plan easily accessible</li>
-                      <li>• Share it with trusted people in your support network</li>
-                      <li>• Review and update it regularly</li>
-                      <li>• Practice using your coping strategies when you're feeling well</li>
-                    </ul>
+                  
+                  <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/40 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="p-1 bg-blue-100 dark:bg-blue-900/20 rounded-lg mt-1">
+                        <AlertTriangle className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Important Reminders</h4>
+                        <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-1">
+                          <li className="flex items-start gap-2">
+                            <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                            <span>Keep your safety plan easily accessible</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                            <span>Share it with trusted people in your support network</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                            <span>Review and update it regularly</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                            <span>Practice using your coping strategies when you're feeling well</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Warning Signs */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
-              <h2 className="text-2xl font-bold mb-6 text-orange-700 dark:text-orange-400 flex items-center gap-2">
-                ⚠️ Warning Signs to Watch For
-              </h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700/40">
-                  <h3 className="font-semibold text-orange-800 dark:text-orange-300 mb-3">🧠 Thoughts</h3>
-                  <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-200">
-                    <li>• Thoughts of death or suicide</li>
-                    <li>• Feeling hopeless or trapped</li>
-                    <li>• Thinking you're a burden</li>
-                    <li>• Feeling unbearable pain</li>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                  <AlertTriangle className="w-6 h-6 text-orange-500 dark:text-orange-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  Warning Signs to Watch For
+                </h2>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-200 dark:border-orange-800/40">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Brain className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Thoughts</h3>
+                  </div>
+                  <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Thoughts of death or suicide</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Feeling hopeless or trapped</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Thinking you're a burden</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Feeling unbearable pain</span>
+                    </li>
                   </ul>
                 </div>
-                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700/40">
-                  <h3 className="font-semibold text-orange-800 dark:text-orange-300 mb-3">😔 Feelings</h3>
-                  <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-200">
-                    <li>• Intense sadness or emptiness</li>
-                    <li>• Overwhelming anxiety</li>
-                    <li>• Rage or anger</li>
-                    <li>• Feeling ashamed or guilty</li>
+                
+                <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-200 dark:border-orange-800/40">
+                  <div className="flex items-center gap-2 mb-3">
+                    <HeartPulse className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Feelings</h3>
+                  </div>
+                  <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Intense sadness or emptiness</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Overwhelming anxiety</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Rage or anger</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Feeling ashamed or guilty</span>
+                    </li>
                   </ul>
                 </div>
-                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-700/40">
-                  <h3 className="font-semibold text-orange-800 dark:text-orange-300 mb-3">🚶 Behaviors</h3>
-                  <ul className="text-sm space-y-1 text-gray-700 dark:text-gray-200">
-                    <li>• Withdrawing from others</li>
-                    <li>• Increased substance use</li>
-                    <li>• Giving away possessions</li>
-                    <li>• Dramatic mood changes</li>
+                
+                <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-200 dark:border-orange-800/40">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ListChecks className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Behaviors</h3>
+                  </div>
+                  <ul className="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Withdrawing from others</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Increased substance use</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Giving away possessions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CircleDot className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-500" />
+                      <span>Dramatic mood changes</span>
+                    </li>
                   </ul>
                 </div>
               </div>
             </div>
 
             {/* Support Network */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
-              <h2 className="text-2xl font-bold mb-6 text-purple-700 dark:text-purple-400 flex items-center gap-2">
-                👥 Building Your Support Network
-              </h2>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  Building Your Support Network
+                </h2>
+              </div>
+              
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-700 dark:text-green-300">Professional Support</h3>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center">
-                      <span className="text-green-600 dark:text-green-400 mr-2">✓</span>
-                      Therapist or counselor
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                      <HeartPulse className="w-5 h-5 text-green-500 dark:text-green-400" />
+                    </div>
+                    <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-100">Professional Support</h3>
+                  </div>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-green-500 dark:text-green-400" />
+                      </div>
+                      <span>Therapist or counselor</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-green-600 dark:text-green-400 mr-2">✓</span>
-                      Primary care doctor
+                    <li className="flex items-start gap-3">
+                      <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-green-500 dark:text-green-400" />
+                      </div>
+                      <span>Primary care doctor</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-green-600 dark:text-green-400 mr-2">✓</span>
-                      Psychiatrist (if applicable)
+                    <li className="flex items-start gap-3">
+                      <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-green-500 dark:text-green-400" />
+                      </div>
+                      <span>Psychiatrist (if applicable)</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-green-600 dark:text-green-400 mr-2">✓</span>
-                      Crisis hotline counselors
+                    <li className="flex items-start gap-3">
+                      <div className="bg-green-100 dark:bg-green-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-green-500 dark:text-green-400" />
+                      </div>
+                      <span>Crisis hotline counselors</span>
                     </li>
                   </ul>
                 </div>
+                
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-700 dark:text-blue-300">Personal Support</h3>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center">
-                      <span className="text-blue-600 dark:text-blue-400 mr-2">✓</span>
-                      Trusted family members
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                      <Users className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                    </div>
+                    <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-100">Personal Support</h3>
+                  </div>
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                      </div>
+                      <span>Trusted family members</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-blue-600 dark:text-blue-400 mr-2">✓</span>
-                      Close friends
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                      </div>
+                      <span>Close friends</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-blue-600 dark:text-blue-400 mr-2">✓</span>
-                      Support group members
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                      </div>
+                      <span>Support group members</span>
                     </li>
-                    <li className="flex items-center">
-                      <span className="text-blue-600 dark:text-blue-400 mr-2">✓</span>
-                      Religious/spiritual leaders
+                    <li className="flex items-start gap-3">
+                      <div className="bg-blue-100 dark:bg-blue-900/20 p-1 rounded-full mt-0.5">
+                        <CircleDot className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                      </div>
+                      <span>Religious/spiritual leaders</span>
                     </li>
                   </ul>
                 </div>
@@ -362,21 +503,29 @@ function CrisisSupport() {
             </div>
 
             {/* Footer Message */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700/40 p-6 rounded-2xl text-center shadow-lg">
-              <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-300 mb-3">
-                🌟 You Are Not Alone
-              </h3>
-              <p className="text-blue-700 dark:text-blue-200 mb-4">
-                Crisis situations are temporary. With the right support and treatment,
-                you can get through this difficult time.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={() => handleEmergencyCall('988')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
-                >
-                  Get Help Now
-                </button>
+            <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/40 p-6 rounded-xl text-center shadow-sm">
+              <div className="max-w-2xl mx-auto">
+                <div className="flex justify-center mb-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                    <LifeBuoy className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                  You Are Not Alone
+                </h3>
+                <p className="text-slate-700 dark:text-slate-300 mb-4">
+                  Crisis situations are temporary. With the right support and treatment,
+                  you can get through this difficult time.
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => handleEmergencyCall('988')}
+                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Get Help Now</span>
+                  </button>
+                </div>
               </div>
             </div>
           </>
