@@ -30,9 +30,9 @@ const Dashboard = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <motion.div 
-          className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md mx-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <motion.div 
             className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-6"
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 ">
         <motion.div 
           className="max-w-7xl mx-auto px-4 py-8"
           variants={containerVariants}
@@ -113,17 +113,17 @@ const Dashboard = () => {
             </div>
             
             <h1 className="text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="bg-blue-500 bg-clip-text text-transparent">
                 Welcome back, {user?.full_name?.split(' ')[0] || user?.username}!
               </span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-900 dark:text-slate-50 max-w-2xl mx-auto">
               Your AI-powered mental health companion is here to support you every step of the way 🌟
             </p>
           </motion.div>
 
           {/* Quick Stats Cards */}
-          <motion.div 
+          {/* <motion.div 
             className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
             variants={itemVariants}
           >
@@ -166,7 +166,7 @@ const Dashboard = () => {
                 <Activity className="w-8 h-8 text-pink-200" />
               </div>
             </div>
-          </motion.div>
+          </motion.div> */}
 
           {/* Main Content Grid */}
           <div className="grid lg:grid-cols-3 gap-8 mb-12">
@@ -179,14 +179,14 @@ const Dashboard = () => {
               <AIInsightsDashboard />
 
               {/* Action Cards */}
-              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center mb-6">
                   <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl mr-4">
                     <Zap className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
-                    <p className="text-gray-600">Take control of your mental wellness journey</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Quick Actions</h2>
+                    <p className=" text-slate-900 dark:text-slate-50">Take control of your mental wellness journey</p>
                   </div>
                 </div>
                 
@@ -239,7 +239,7 @@ const Dashboard = () => {
           
               
               {/* progress card */}
-              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-800">
+              {/* <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-800">
                 <div className="flex items-center mb-4">
                   <Award className="w-6 h-6 text-yellow-500 dark:text-yellow-400 mr-3" />
                   <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Your Progress</h3>
@@ -282,7 +282,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </motion.div>
           </div>
         </motion.div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useContext, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { Brain } from 'lucide-react'
+import { Brain, Moon, Sun, User, HelpCircle, Lock, Star, UserPlus, LogIn, AlertCircle } from 'lucide-react'
 
 const Navigation = () => {
   const { theme, toggleTheme } = useTheme()
@@ -19,12 +19,12 @@ const Navigation = () => {
     { path: '/', label: 'Home', emoji: '', public: true },
     { path: '/mood-check', label: 'Mood Check', emoji: '', protected: true },
     { path: '/dashboard', label: 'Dashboard', emoji: '', protected: true },
-    { path: '/crisis-support', label: 'Crisis Support', emoji: '🆘', public: true }
+    { path: '/crisis-support', label: 'Crisis Support', emoji: <AlertCircle className='text-red-500'  />, public: true }
   ]
 
   const authItems = [
-    { path: '/auth/login', label: 'Sign In', emoji: '🔑' },
-    { path: '/auth/register', label: 'Sign Up', emoji: '✨' }
+    { path: '/auth/login', label: 'Sign In', emoji: <LogIn /> },
+    { path: '/auth/register', label: 'Sign Up', emoji: <UserPlus /> }
   ]
 
   // Handle scroll behavior
@@ -152,8 +152,8 @@ const Navigation = () => {
                 <motion.div key={item.path} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     to={item.path}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                    className={`px-4 py-2 rounded-lg text-md font-medium transition-all duration-200 flex items-center space-x-2 ${isActive(item.path)
+                      ? 'bg-blue-500 dark:bg-blue-800 text-white dark:text-slate-50 shadow-lg'
                       : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
                       }`}
                   >
@@ -178,7 +178,7 @@ const Navigation = () => {
           <div className="flex items-center space-x-2">
             {/* Theme Toggle Button */}
             <button onClick={toggleTheme} className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:opacity-80 transition">
-              {theme === 'dark' ? '🌙' : '☀️'}
+              {theme === 'dark' ? <Moon /> : <Sun className='text-yellow-500'/>}
             </button>
 
             {isAuthenticated ? (
@@ -190,7 +190,7 @@ const Navigation = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span className="text-lg">👤</span>
+                  <span className="text-lg"><User /></span>
                   <span className="hidden sm:inline">{user?.username || 'User'}</span>
                   <motion.span
                     animate={{ rotate: showUserMenu ? 180 : 0 }}

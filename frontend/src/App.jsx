@@ -37,14 +37,14 @@ function App() {
       <AuthProvider>
         <MoodProvider>
           <ToastProvider>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 text-black dark:text-white transition-colors duration-300">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-black dark:text-white transition-colors duration-300">
               {/* PWA Status Components */}
               <OfflineStatus />
               <ServiceWorkerUpdate />
 
               <Navigation/>
 
-              <main className="container mx-auto px-4 py-8">
+              <main className=" mx-auto py-8">
                 <PageTransition>
                   <Routes>
                     <Route path="/" element={<HomePage />} />
