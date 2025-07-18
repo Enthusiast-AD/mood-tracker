@@ -510,7 +510,7 @@ function MoodCheck() {
         transition={{ delay: 0.2 }}
       >
         <motion.h1 
-          className="text-5xl font-bold text-gray-900 mt-2 mb-4"
+          className="text-5xl font-bold text-blue-500  mt-2 mb-4"
           animate={{ 
             scale: [1, 1.02, 1]
           }}
@@ -524,7 +524,7 @@ function MoodCheck() {
         </motion.h1>
         
         <motion.p 
-          className="text-gray-600 text-xl mb-6"
+          className="text-blue-400 text-xl mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -689,7 +689,7 @@ function MoodCheck() {
 
       {/* Main Form Container */}
       <motion.div 
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800"
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}

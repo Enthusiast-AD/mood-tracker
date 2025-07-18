@@ -172,13 +172,13 @@ const AIInsightsDashboard = () => {
   return (
     <div className="space-y-8">
       {/* Clean Header */}
-      <motion.div 
+      {/* <motion.div 
         className={`bg-gradient-to-r ${getStatusColor()} text-white rounded-2xl p-6 shadow-xl`}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-      >
-        <div className="flex items-center justify-between">
+      > */}
+        {/* <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <motion.div
               className="p-3 bg-white bg-opacity-20 rounded-xl"
@@ -219,11 +219,11 @@ const AIInsightsDashboard = () => {
               <RefreshCw className="w-5 h-5" />
             </motion.button>
           </div>
-        </div>
-      </motion.div>
+        </div> */}
+      {/* </motion.div> */}
 
       {/* Clean Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
         <MetricCard
           title="Current Sentiment"
           value={analytics?.mood_trend === 'improving' ? 'Positive' : 
@@ -329,10 +329,10 @@ const InsightsCard = ({ insights }) => (
 // Clean Metric Card Component
 const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
   const colorClasses = {
-    blue: 'from-blue-500 to-blue-600 dark:from-blue-800 dark:to-blue-900',
-    green: 'from-green-500 to-green-600 dark:from-green-800 dark:to-green-900', 
-    red: 'from-red-500 to-red-600 dark:from-red-800 dark:to-red-900',
-    purple: 'from-purple-500 to-purple-600 dark:from-purple-800 dark:to-purple-900'
+    blue: 'from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700',
+    green: 'from-green-500 to-green-600 dark:from-green-600 dark:to-green-700', 
+    red: 'from-red-500 to-red-600 dark:from-red-600 dark:to-red-700',
+    purple: 'from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700'
   }
 
   const getTrendIcon = () => {
@@ -343,7 +343,7 @@ const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
 
   return (
     <motion.div
-      className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      className="bg-white dark:slate-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
