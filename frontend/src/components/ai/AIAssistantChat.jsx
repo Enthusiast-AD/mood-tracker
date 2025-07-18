@@ -278,14 +278,14 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
       style={{ zIndex: 10000 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="absolute right-4 top-4 bottom-4 w-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+        className="absolute right-4 top-4 bottom-4 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
         initial={{ x: 400, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 400, opacity: 0 }}
@@ -322,7 +322,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
         <AnimatePresence>
           {crisisAlert && (
             <motion.div
-              className="bg-red-50 border-l-4 border-red-500 p-4 m-4 rounded-lg"
+              className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 m-4 rounded-lg"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -355,7 +355,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
         </AnimatePresence>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50 dark:bg-gray-800/50">
           <AnimatePresence>
             {messages.map((message) => (
               <motion.div
@@ -370,8 +370,8 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
                   message.type === 'user' 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
                     : message.isError
-                    ? 'bg-red-50 border border-red-200 text-red-800'
-                    : 'bg-gray-100 text-gray-800'
+                    ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                 } rounded-2xl p-4 shadow-lg`}>
                   
                   {/* Message Header */}
@@ -401,7 +401,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
                       <button
                         onClick={() => speakText(message.content)}
                         disabled={isSpeaking}
-                        className="flex items-center space-x-1 text-xs bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded-full transition-colors disabled:opacity-50"
+                        className="flex items-center space-x-1 text-xs bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-2 py-1 rounded-full transition-colors disabled:opacity-50"
                       >
                         <Volume2 className="w-3 h-3" />
                         <span>Speak</span>
@@ -434,10 +434,10 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="bg-gray-100 rounded-2xl p-4 shadow-lg">
+              <div className="bg-white dark:bg-gray-700 rounded-2xl p-4 shadow-lg">
                 <div className="flex items-center space-x-2">
-                  <Loader className="w-4 h-4 animate-spin" />
-                  <span className="text-sm text-gray-600">AI is thinking...</span>
+                  <Loader className="w-4 h-4 animate-spin text-gray-600 dark:text-gray-300" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300">AI is thinking...</span>
                 </div>
               </div>
             </motion.div>
@@ -450,14 +450,14 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
         <AnimatePresence>
           {recommendations.length > 0 && (
             <motion.div
-              className="mx-4 mb-4 p-4 bg-green-50 border border-green-200 rounded-xl"
+              className="mx-4 mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
             >
               <div className="flex items-center space-x-2 mb-3">
-                <Lightbulb className="w-4 h-4 text-green-600" />
-                <h4 className="font-semibold text-green-800 text-sm">AI Recommendations</h4>
+                <Lightbulb className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <h4 className="font-semibold text-green-800 dark:text-green-200 text-sm">AI Recommendations</h4>
               </div>
               <div className="space-y-2">
                 {recommendations.slice(0, 3).map((rec, index) => (
@@ -478,7 +478,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
         </AnimatePresence>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex items-end space-x-2">
             <div className="flex-1">
               <textarea
@@ -486,7 +486,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Share your thoughts with AI..."
-                className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full p-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
                 rows="2"
                 disabled={isLoading}
               />
@@ -522,7 +522,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
           </div>
 
           {/* Status indicators */}
-          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+          <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-4">
               {isListening && (
                 <span className="flex items-center space-x-1 text-red-500">

@@ -10,7 +10,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt'
 import ServiceWorkerUpdate from './components/ServiceWorkerUpdate'
 import PageTransition from './components/animations/PageTransition'
 import EnhancedToaster from './components/ui/EnhancedToast'
-import FloatingActionButton from './components/ui/FloatingActionButton'
+// import FloatingActionButton from './components/ui/FloatingActionButton'
 import SmartNotificationScheduler from './services/SmartNotificationScheduler'
 
 // Pages
@@ -82,7 +82,7 @@ function App() {
               </main>
 
               {/* Enhanced UI Components */}
-              <FloatingActionButton />
+              {/* <FloatingActionButton /> */}
               <EnhancedToaster />
 
               {/* PWA Install Prompt */}

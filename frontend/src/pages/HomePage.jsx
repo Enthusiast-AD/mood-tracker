@@ -166,7 +166,7 @@ function HomePage() {
                     className="absolute inset-0 bg-clip-text text-transparent"
                     style={{
                       backgroundSize: '200% 100%',
-                      backgroundImage: 'linear-gradient(90deg, transparent 0%, transparent 45%, rgba(59, 130, 246, 0.9) 50%, transparent 55%, transparent 100%)'
+                      backgroundImage: 'linear-gradient(90deg, transparent 0%, transparent 45%, rgba(59, 30, 246, 0.9) 50%, transparent 55%, transparent 100%)'
                     }}
                     animate={{
                       backgroundPosition: ['200% 0', '-200% 0']
