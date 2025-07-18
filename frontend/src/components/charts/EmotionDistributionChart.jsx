@@ -218,43 +218,12 @@ const EmotionDistributionChart = ({ moodHistory = [], title = "Emotion Distribut
         </div>
       </motion.div>
 
-      {/* Side Widgets */}
-      <div className="space-y-6">
-        
 
-        
-        {/* {emotionData.length > 1 && emotionData[0].emotion !== 'No data' && (
-          <motion.div
-            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 shadow-lg border border-purple-100"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <h5 className="font-semibold text-purple-800 mb-3 flex items-center">
-              <span className="text-lg mr-2">🎭</span>
-              Insights
-            </h5>
-            <div className="text-sm text-purple-700 space-y-2">
-              <div className="flex items-start space-x-2">
-                <span className="text-purple-500 mt-1">•</span>
-                <p>
-                  <strong>{emotionData[0].emotion}</strong> dominates at {((emotionData[0].count / totalEntries) * 100).toFixed(1)}%
-                </p>
-              </div>
-              {emotionData.length > 1 && (
-                <div className="flex items-start space-x-2">
-                  <span className="text-purple-500 mt-1">•</span>
-                  <p>
-                    Good emotional range with <strong>{emotionData.length}</strong> different emotions
-                  </p>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )} */}
-      </div>
+
 
     </div>
+
+
   )
 }
 

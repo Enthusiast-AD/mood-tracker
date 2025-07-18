@@ -37,7 +37,7 @@ const OfflineStatus = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50">
+    <div className="fixed bottom-0 left-0 right-0 z-50">
       {/* Offline Banner */}
       {!isOnline && (
         <div className="bg-yellow-500 text-white px-4 py-2 text-center text-sm font-medium">

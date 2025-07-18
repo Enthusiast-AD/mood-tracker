@@ -15,6 +15,7 @@ import {
   Shield,
   Activity
 } from 'lucide-react'
+import Footer from '../components/layout/Footer'
 
 const Dashboard = () => {
   const { user, isAuthenticated } = useAuth()
@@ -24,8 +25,8 @@ const Dashboard = () => {
   // Update loading condition to check for both loading state and data
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-950 py-8">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-950">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <DashboardSkeleton />
         </div>
       </div>
@@ -93,9 +94,9 @@ const Dashboard = () => {
             variants={itemVariants}
           >
             <div className="flex flex-col items-center justify-center">
-              <motion.div 
+              <motion.div
                 className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl flex items-center justify-center mb-4"
-                animate={{ 
+                animate={{
                   rotate: [0, 360],
                   scale: [1, 1, 1]
                 }}
@@ -126,7 +127,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Status Cards */}
-          
+
 
           <div className="grid lg:grid-cols-3 gap-6">
             <motion.div
@@ -155,11 +156,13 @@ const Dashboard = () => {
           user={user}
         />
       )}
-      
+
       {/* Floating AI Button */}
       <div className="fixed bottom-6 right-6">
         <AIAssistantButton onClick={() => setShowAIChat(true)} />
       </div>
+
+      <Footer />
     </>
   )
 }

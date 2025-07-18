@@ -94,14 +94,14 @@ function CrisisSupport() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 pb-16">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-blue-800/10 dark:from-blue-800/20 dark:to-blue-900/30">
+      <div className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-20 text-center relative z-10">
-          <div className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent animate-gradient">
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+          <div className="inline-block">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
               Crisis Support
             </h1>
           </div>
-          <p className="text-lg md:text-xl text-slate-700 dark:text-slate-200 mb-6">
+          <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 mb-6">
             If you're having thoughts of self-harm or suicide, you're not alone.<br />
             Help is available 24/7. Your safety matters.
           </p>
@@ -130,10 +130,10 @@ function CrisisSupport() {
           </div>
         </div>
         
-        {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden opacity-20 dark:opacity-30">
-          <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        {/* Decorative elements with adjusted opacity */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-400/20 dark:bg-blue-500/10 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl"></div>
+          <div className="absolute -bottom-20 right-0 w-64 h-64 bg-white-100/20 dark:bg-purple-500/10 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl"></div>
         </div>
       </div>
 

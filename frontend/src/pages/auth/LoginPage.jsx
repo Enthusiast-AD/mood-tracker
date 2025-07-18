@@ -56,18 +56,18 @@ const LoginPage = () => {
         <div className="text-center mb-2">
           <div className="flex items-center gap-3 justify-center mb-6">
             <motion.div
-              className="p-2.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg"
+              className="p-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg"
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             >
               <Brain className="w-8 h-8 text-white" />
             </motion.div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            <span>
-              Mental Health AI
-            </span>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              <span>
+                Mental Health AI
+              </span>
 
-          </h1>
+            </h1>
           </div>
           <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
             Sign in to your account

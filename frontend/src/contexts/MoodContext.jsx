@@ -26,7 +26,7 @@ export const MoodProvider = ({ children }) => {
     riskAssessment: null,
     modelStatus: {
       sentiment: 'active',
-      emotion: 'active', 
+      emotion: 'active',
       crisis: 'active',
       prediction: 'active'
     },
@@ -59,9 +59,9 @@ export const MoodProvider = ({ children }) => {
             console.log('📡 WebSocket endpoint not available yet - using polling fallback')
             return
           }
-          
+
           const ws = new WebSocket(`ws://localhost:8000/ws/${token}`)
-          
+
           ws.onopen = () => {
             console.log('🔗 WebSocket connected for real-time AI updates')
             setWebsocket(ws)
@@ -70,7 +70,7 @@ export const MoodProvider = ({ children }) => {
           ws.onmessage = (event) => {
             const data = JSON.parse(event.data)
             console.log('📡 Real-time AI update received:', data)
-            
+
             if (data.type === 'complete_ai_mood_tracked') {
               setRealtimeAnalysis(data.complete_ai_analysis)
               updateAIDashboard(data)
@@ -89,7 +89,7 @@ export const MoodProvider = ({ children }) => {
         .catch(() => {
           console.log('📡 Backend not available for WebSocket - continuing without real-time updates')
         })
-        
+
     } catch (error) {
       console.log('⚠️ WebSocket initialization skipped:', error.message)
     }
@@ -110,13 +110,13 @@ export const MoodProvider = ({ children }) => {
 
   const getMoodTrend = () => {
     if (moodHistory.length < 2) return 'stable'
-    
+
     const recent = moodHistory.slice(0, 5)
     const older = moodHistory.slice(5, 10)
-    
+
     const recentAvg = recent.reduce((sum, entry) => sum + entry.score, 0) / recent.length
     const olderAvg = older.length > 0 ? older.reduce((sum, entry) => sum + entry.score, 0) / older.length : recentAvg
-    
+
     if (recentAvg > olderAvg + 0.5) return 'improving'
     if (recentAvg < olderAvg - 0.5) return 'declining'
     return 'stable'
@@ -182,6 +182,7 @@ export const MoodProvider = ({ children }) => {
 
   const value = {
     moodHistory,
+    moods: moodHistory, // Add this line
     analytics,
     insights,
     crisisIncidents,
