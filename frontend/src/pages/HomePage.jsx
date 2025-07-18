@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import Footer from '../components/layout/Footer'
 import { 
   LineChart, 
   Shield, 
@@ -475,45 +476,6 @@ function HomePage() {
         </div>
       </motion.div>
       
-      {/* Footer */}
-      <footer className="bg-slate-100 text-slate-800 py-8 mt-16 dark:bg-slate-900 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <Link to="/privacy" className="text-slate-800 text-sm dark:text-slate-200">Privacy Policy</Link>
-            <span className="mx-2">|</span>
-            <Link to="/terms" className="text-slate-800 text-sm dark:text-slate-200">Terms of Service</Link>
-            <span className="mx-2">|</span>
-            <Link to="/contact" className="text-slate-800 text-sm dark:text-slate-200">Contact Us</Link>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <Link to="/about" className="text-slate-800 text-sm dark:text-slate-200">About Us</Link>
-            <span className="mx-2">|</span>
-            <Link to="/blog" className="text-slate-800 text-sm dark:text-slate-200">Blog</Link>
-            <span className="mx-2">|</span>
-            <Link to="/help" className="text-slate-800 text-sm dark:text-slate-200">
-              <HelpCircle className="inline w-4 h-4 mr-1" />
-              Help Center
-            </Link>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <Link to="/faq" className="text-slate-800 text-sm dark:text-slate-200">FAQ</Link>
-            <span className="mx-2">|</span>
-            <Link to="/support" className="text-slate-800 text-sm dark:text-slate-200">
-              <Mail className="inline w-4 h-4 mr-1" />
-              Support
-            </Link>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 text-center mt-8">
-          <p className="text-sm">&copy; {new Date().getFullYear()} Mood Tracker. All rights reserved.</p>
-          <p className="text-xs mt-2 flex items-center justify-center">
-            Made with <Heart className="w-4 h-4 mx-1 text-red-500 fill-red-500" /> for better mental health
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

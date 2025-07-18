@@ -10,6 +10,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt'
 import ServiceWorkerUpdate from './components/ServiceWorkerUpdate'
 import PageTransition from './components/animations/PageTransition'
 import EnhancedToaster from './components/ui/EnhancedToast'
+import Footer from '../src/components/layout/Footer'
 // import FloatingActionButton from './components/ui/FloatingActionButton'
 import SmartNotificationScheduler from './services/SmartNotificationScheduler'
 
@@ -88,10 +89,12 @@ function App() {
               {/* PWA Install Prompt */}
               <PWAInstallPrompt />
             </div>
+      <Footer />
           </ToastProvider>
         </MoodProvider>
       </AuthProvider>
     </ErrorBoundary>
+
   )
 }
 
