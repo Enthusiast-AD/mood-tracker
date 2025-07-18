@@ -35,14 +35,15 @@ const QuickActionsWidget = ({ onChatClick }) => {
     ];
 
     const ActionButton = ({ action }) => {
-        const baseClassName = `group block w-full p-3 ${action.hoverBg} hover:shadow-md rounded-lg transition-all duration-300`;
+        // Add text-left to the base className to ensure consistent left alignment
+        const baseClassName = `group block w-full p-3 ${action.hoverBg} hover:shadow-md rounded-lg transition-all duration-300 text-left`;
         
         const content = (
             <div className="flex items-center space-x-3">
                 <div className={`p-2 bg-gradient-to-r ${action.gradient} rounded-lg transition-transform group-hover:scale-110`}>
                     <div className="text-white">{action.icon}</div>
                 </div>
-                <div>
+                <div className="flex-1"> {/* Add flex-1 to ensure proper spacing */}
                     <p className={`font-medium text-gray-900 dark:text-white ${action.activeColor} transition-colors`}>
                         {action.title}
                     </p>

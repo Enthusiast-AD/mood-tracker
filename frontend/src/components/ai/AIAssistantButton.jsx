@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Brain, MessageCircle, Sparkles } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
-const AIAssistantButton = ({ onClick, hasNewRecommendations = false }) => {
+export const AIAssistantButton = ({ onClick, hasNewRecommendations = false }) => {
   const { user } = useAuth()
   const [isHovered, setIsHovered] = useState(false)
 
@@ -12,7 +12,8 @@ const AIAssistantButton = ({ onClick, hasNewRecommendations = false }) => {
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
+      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105"
+      aria-label="Open AI Chat"
       style={{ zIndex: 9999 }} // Highest z-index to stay above everything
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
