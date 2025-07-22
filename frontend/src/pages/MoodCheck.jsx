@@ -5,7 +5,7 @@ import { showToast } from '../components/ui/EnhancedToast'
 import AnimatedButton from '../components/ui/AnimatedButton'
 import VoiceInput from '../components/voice/VoiceInput'
 import NotificationService from '../services/NotificationService'
-import { MoodCheckSkeleton } from '../components/ui/LoadingStates'
+// import { MoodCheckSkeleton } from '../components/ui/LoadingStates'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -1184,7 +1184,7 @@ function MoodCheck() {
                     {moodEntry.notes && (
                       <div className="mt-3 pt-3 border-t border-green-200">
                         <span className="font-semibold text-green-700 dark:text-green-300">Notes:</span>
-                        <p className="text-green-600 mt-1 text-sm italic">
+                        <p className="text-green-600 dark:text-green-200 mt-1 text-sm italic">
                           "{moodEntry.notes.substring(0, 100)}{moodEntry.notes.length > 100 ? '...' : ''}"
                         </p>
                       </div>

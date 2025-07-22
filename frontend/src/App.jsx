@@ -43,7 +43,7 @@ function App() {
               <OfflineStatus />
               <ServiceWorkerUpdate />
 
-              <Navigation/>
+              <Navigation />
 
               <main className=" mx-auto py-8">
                 <PageTransition>
@@ -89,7 +89,7 @@ function App() {
               {/* PWA Install Prompt */}
               <PWAInstallPrompt />
             </div>
-      <Footer />
+            <Footer />
           </ToastProvider>
         </MoodProvider>
       </AuthProvider>

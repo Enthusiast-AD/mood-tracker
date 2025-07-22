@@ -1,95 +1,85 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Heart } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { Brain } from 'lucide-react'
 
 const Footer = () => {
     return (
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* Company Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">MoodTracker</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Empowering mental wellness through mindful tracking and AI insights.
+
+        <footer className="bg-slate-900 text-white py-16">
+            <div className="max-w-7xl mx-auto px-4">
+                <motion.div
+                    className="grid md:grid-cols-4 gap-8"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <div className="md:col-span-2">
+                        <motion.div
+                            className="flex items-center space-x-3 mb-6"
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <Brain className="w-6 h-6 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold">Mental Health Hub</h3>
+                        </motion.div>
+                        <p className="text-slate-400 leading-relaxed max-w-md mb-6">
+                            Empowering millions to understand and improve their mental health
+                            through AI-powered insights and compassionate support.
                         </p>
-                    </div>
-
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link to="/dashboard" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/tracker" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    Mood Tracker
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/insights" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    AI Insights
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Resources */}
-                    <div>
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Resources</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link to="/crisis-support" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    Crisis Support
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/help" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    Help Center
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/privacy" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Contact</h4>
-                        <ul className="space-y-2">
-                            <li>
-                                <a href="mailto:support@moodtracker.com" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    support@moodtracker.com
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://twitter.com/moodtracker" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400">
-                                    @moodtracker
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* Bottom Bar */}
-                <div className=" content-center mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                    <div className="text-center md:flex-row ">
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                            © {new Date().getFullYear()} MoodTracker. All rights reserved.
-                        </p>
-                        <div className="flex justify-center space-x-1 text-sm text-gray-600 dark:text-gray-300 mt-4 md:mt-0">
-                            <span>Made with</span>
-                            <Heart className="w-4 h-4 text-red-500 fill-current mt-0.5" />
-                            <span>by MoodTracker Team</span>
+                        <div className="flex space-x-4">
+                            {['📱', '💬', '📧', '🌐'].map((emoji, index) => (
+                                <motion.div
+                                    key={index}
+                                    className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center cursor-pointer"
+                                    whileHover={{ scale: 1.2, backgroundColor: "#475569" }}
+                                    whileTap={{ scale: 0.9 }}
+                                >
+                                    <span className="text-lg">{emoji}</span>
+                                </motion.div>
+                            ))}
                         </div>
                     </div>
-                </div>
+
+                    <div>
+                        <h4 className="font-bold mb-4">Features</h4>
+                        <ul className="space-y-2 text-slate-400">
+                            {['Mood Tracking', 'AI Insights', 'Crisis Support', 'Analytics', 'Community'].map((item, index) => (
+                                <motion.li
+                                    key={index}
+                                    className="hover:text-white cursor-pointer transition-colors duration-200"
+                                    whileHover={{ x: 5 }}
+                                >
+                                    {item}
+                                </motion.li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="font-bold mb-4">Support</h4>
+                        <ul className="space-y-2 text-slate-400">
+                            {['Help Center', 'Privacy Policy', 'Terms of Service', 'Contact Us', 'FAQ'].map((item, index) => (
+                                <motion.li
+                                    key={index}
+                                    className="hover:text-white cursor-pointer transition-colors duration-200"
+                                    whileHover={{ x: 5 }}
+                                >
+                                    {item}
+                                </motion.li>
+                            ))}
+                        </ul>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    className="border-t border-slate-800 mt-12 pt-8 text-center text-slate-400"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.8 }}
+                >
+                    <p>&copy; 2024 Mental Health Hub. Made with ❤️ for your wellbeing.</p>
+                </motion.div>
             </div>
         </footer>
     )
