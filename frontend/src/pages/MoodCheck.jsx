@@ -1154,36 +1154,36 @@ function MoodCheck() {
 
                   {/* Summary Before Submit */}
                   <motion.div
-                    className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6"
+                    className=" bg-green-100 dark:bg-green-900/20 border-green-200 rounded-xl p-6"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.4 }}
                   >
-                    <h3 className="font-bold text-green-800 mb-3 flex items-center">
+                    <h3 className="font-bold text-green-800  dark:text-green-200 mb-3 flex items-center">
                       <span className="mr-2">📋</span>
                       Your Mood Summary
                     </h3>
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-semibold text-green-700">Mood Score:</span>
+                        <span className="font-semibold text-green-700 dark:text-green-300">Mood Score:</span>
                         <span className="ml-2">{moodEntry.score}/11 ({moodDescriptions[moodEntry.score].text})</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-green-700">Emotions:</span>
+                        <span className="font-semibold text-green-700 dark:text-green-300">Emotions:</span>
                         <span className="ml-2">{moodEntry.emotions.join(', ') || 'None selected'}</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-green-700">Activity:</span>
+                        <span className="font-semibold text-green-700 dark:text-green-300">Activity:</span>
                         <span className="ml-2">{moodEntry.activity || 'Not specified'}</span>
                       </div>
                       <div>
-                        <span className="font-semibold text-green-700">Location:</span>
+                        <span className="font-semibold text-green-700 dark:text-green-300">Location:</span>
                         <span className="ml-2">{moodEntry.location || 'Not specified'}</span>
                       </div>
                     </div>
                     {moodEntry.notes && (
                       <div className="mt-3 pt-3 border-t border-green-200">
-                        <span className="font-semibold text-green-700">Notes:</span>
+                        <span className="font-semibold text-green-700 dark:text-green-300">Notes:</span>
                         <p className="text-green-600 mt-1 text-sm italic">
                           "{moodEntry.notes.substring(0, 100)}{moodEntry.notes.length > 100 ? '...' : ''}"
                         </p>

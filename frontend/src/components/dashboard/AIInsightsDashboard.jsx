@@ -227,7 +227,7 @@ const AIInsightsDashboard = () => {
         <MetricCard
           title="Current Sentiment"
           value={analytics?.mood_trend === 'improving' ? 'Positive' : 
-                analytics?.mood_trend === 'declining' ? 'Concerning' : 'Neutral'}
+                analytics?.mood_trend === 'Declining' ? 'Concerning' : 'Neutral'}
           subtitle={`${analytics?.total_entries || 0} entries analyzed`}
           icon={<BarChart3 className="w-6 h-6" />}
           color="blue"
@@ -249,7 +249,7 @@ const AIInsightsDashboard = () => {
           subtitle={`${analytics?.crisis_incidents || 0} incidents`}
           icon={<Shield className="w-6 h-6" />}
           color={analytics?.crisis_incidents > 0 ? 'red' : 'green'}
-          trend="stable"
+          trend={analytics?.crisis_incidents > 0 ? 'declining' : 'stable'}
         />
         
         <MetricCard
@@ -258,7 +258,7 @@ const AIInsightsDashboard = () => {
           subtitle="Total mood entries"
           icon={<Target className="w-6 h-6" />}
           color="purple"
-          trend="up"
+          trend={analytics?.mood_trend}
         />
       </div>
 
