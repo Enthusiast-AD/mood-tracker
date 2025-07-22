@@ -152,6 +152,7 @@ function MoodCheck() {
   ]
 
   const moodDescriptions = {
+    0: { text: "Feeling terrible", color: "text-red-800", bg: "bg-red-200" },
     1: { text: "Really struggling", color: "text-red-700", bg: "bg-red-100" },
     2: { text: "Having a tough time", color: "text-red-600", bg: "bg-red-50" },
     3: { text: "Feeling low", color: "text-orange-600", bg: "bg-orange-50" },
@@ -774,14 +775,14 @@ function MoodCheck() {
                     transition={{ duration: 0.3 }}
                   >
                     <span className={`text-2xl font-bold ${moodDescriptions[moodEntry.score].color}`}>
-                      {moodEntry.score}/10 - {moodDescriptions[moodEntry.score].text}
+                      {moodEntry.score}/11 - {moodDescriptions[moodEntry.score].text}
                     </span>
                   </motion.div>
                   
                   <div className="px-4">
                     <motion.input
                       type="range"
-                      min="1"
+                      min="0"
                       max="10"
                       value={moodEntry.score}
                       onChange={(e) => setMoodEntry(prev => ({ ...prev, score: parseInt(e.target.value) }))}
@@ -1165,7 +1166,7 @@ function MoodCheck() {
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="font-semibold text-green-700">Mood Score:</span>
-                        <span className="ml-2">{moodEntry.score}/10 ({moodDescriptions[moodEntry.score].text})</span>
+                        <span className="ml-2">{moodEntry.score}/11 ({moodDescriptions[moodEntry.score].text})</span>
                       </div>
                       <div>
                         <span className="font-semibold text-green-700">Emotions:</span>
