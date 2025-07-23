@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { Brain } from 'lucide-react'
 
+
+
 const Footer = () => {
     return (
 

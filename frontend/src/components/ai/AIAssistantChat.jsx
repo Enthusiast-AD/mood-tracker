@@ -283,6 +283,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={onClose}
     >
       <motion.div
         className="absolute right-4 top-4 bottom-4 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
@@ -290,6 +291,7 @@ const AIAssistantChat = ({ isOpen, onClose, user }) => {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 400, opacity: 0 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-4 text-white">

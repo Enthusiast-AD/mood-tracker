@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
-import { 
-  LineChart, 
-  Shield, 
-  Smartphone, 
-  AlertTriangle, 
-  BarChart2, 
+import {
+  LineChart,
+  Shield,
+  Smartphone,
+  AlertTriangle,
+  BarChart2,
   Bot,
   Smile,
   Target,
@@ -21,9 +21,12 @@ import {
   TrendingUp,
   Users,
   Calendar,
-  Eye
+  Eye,
+  Sun,
+  Cloud,
+  Star
 } from 'lucide-react'
-
+import RightSection from '../components/ui/homepgAnimation'
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -135,21 +138,21 @@ function HomePage() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       particlesRef.current.forEach(particle => {
         particle.x += particle.speedX
         particle.y += particle.speedY
-        
+
         if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1
         if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1
-        
+
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2)
         ctx.fillStyle = particle.color
         ctx.globalAlpha = particle.opacity
         ctx.fill()
       })
-      
+
       animationRef.current = requestAnimationFrame(animate)
     }
 
@@ -266,18 +269,18 @@ function HomePage() {
                 </h1>
               </motion.div>
 
-              <motion.p 
+              <motion.p
                 className="text-xl lg:text-2xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
               >
-                Transform your emotional well-being with AI-powered insights, 
+                Transform your emotional well-being with AI-powered insights,
                 real-time mood tracking, and personalized mental health support.
               </motion.p>
 
               {/* Interactive Stats */}
-              <motion.div 
+              <motion.div
                 className="grid grid-cols-3 gap-4 py-6"
                 variants={containerVariants}
                 initial="hidden"
@@ -292,9 +295,9 @@ function HomePage() {
                     key={index}
                     className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-4 text-center border border-slate-200/50 dark:border-slate-700/50"
                     variants={itemVariants}
-                    whileHover={{ 
-                      scale: 1.05, 
-                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" 
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
                     }}
                   >
                     <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-400">
@@ -315,8 +318,13 @@ function HomePage() {
               >
                 <motion.button
                   className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-xl flex items-center justify-center space-x-3 relative overflow-hidden"
-                  whileHover={{ 
-                    scale: 1.05,
+                  animate={{ y: [1, 4, 1] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                  }}
+                  whileHover={{
+                    scale: 1.1,
                     boxShadow: "0 25px 50px -12px rgba(59, 130, 246, 0.5)"
                   }}
                   whileTap={{ scale: 0.95 }}
@@ -326,13 +334,6 @@ function HomePage() {
                   />
                   <Brain className="w-5 h-5 relative z-10" />
                   <span className="relative z-10">Start Your Journey</span>
-                  <motion.div
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Zap className="w-4 h-4" />
-                  </motion.div>
                 </motion.button>
 
                 <motion.button
@@ -348,121 +349,7 @@ function HomePage() {
           </motion.div>
 
           {/* Right Side - Interactive Mood Visualization */}
-          <motion.div
-            className="relative lg:h-[600px] h-[500px]"
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-          >
-            {/* Canvas Background */}
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 w-full h-full rounded-3xl"
-              style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))' }}
-            />
-
-            {/* Central Mood Display */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div
-                className="relative"
-                key={currentMoodIndex}
-                initial={{ scale: 0, rotate: -180, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                exit={{ scale: 0, rotate: 180, opacity: 0 }}
-                transition={{ duration: 0.6, type: "spring" }}
-              >
-                <div className={`w-32 h-32 rounded-full bg-gradient-to-br ${moodCards[currentMoodIndex].color} flex items-center justify-center text-6xl shadow-2xl`}>
-                  {moodCards[currentMoodIndex].emoji}
-                </div>
-                <motion.div
-                  className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <div className="text-xl font-bold text-slate-800 dark:text-slate-200">
-                    {moodCards[currentMoodIndex].label}
-                  </div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">Feeling great today!</div>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            {/* Floating Mood Cards */}
-            <AnimatePresence>
-              {moodCards.map((mood, index) => {
-                if (index === currentMoodIndex) return null
-                
-                const positions = [
-                  { top: '10%', left: '15%' },
-                  { top: '20%', right: '10%' },
-                  { bottom: '20%', left: '20%' },
-                  { bottom: '15%', right: '15%' },
-                  { top: '45%', left: '5%' },
-                  { top: '55%', right: '5%' }
-                ]
-                
-                return (
-                  <motion.div
-                    key={index}
-                    className={`absolute w-16 h-16 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm flex items-center justify-center text-2xl shadow-lg border border-slate-200/50 dark:border-slate-700/50`}
-                    style={positions[index % positions.length]}
-                    variants={floatingVariants}
-                    animate="animate"
-                    initial={{ scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ 
-                      scale: 1.2, 
-                      zIndex: 10,
-                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)" 
-                    }}
-                  >
-                    {mood.emoji}
-                  </motion.div>
-                )
-              })}
-            </AnimatePresence>
-
-            {/* Progress Ring */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <motion.svg
-                width="200"
-                height="200"
-                className="transform -rotate-90"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-              >
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  stroke="rgba(59, 130, 246, 0.2)"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <motion.circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  stroke="url(#gradient)"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 0.75 }}
-                  transition={{ duration: 2, ease: "easeInOut" }}
-                />
-                <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3B82F6" />
-                    <stop offset="100%" stopColor="#8B5CF6" />
-                  </linearGradient>
-                </defs>
-              </motion.svg>
-            </div>
-          </motion.div>
+          <RightSection/>
         </div>
       </div>
 
@@ -479,14 +366,35 @@ function HomePage() {
           variants={itemVariants}
         >
           <motion.h2
-            className="text-4xl lg:text-6xl font-bold mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            className="relative text-6xl font-bold overflow-hidden justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 1.2 }}
           >
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-              Revolutionary Features
+            {/* Base gradient text */}
+            <span className="inline-block bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">
+              Features for Your Health
             </span>
+
+            {/* Smooth shimmer effect */}
+            <motion.span
+              className="absolute inset-0 bg-clip-text text-transparent"
+              style={{
+                backgroundSize: '200% 100%',
+                backgroundImage: 'linear-gradient(90deg, transparent 0%, transparent 45%, rgb(59 130 255 / 0.9) 50%, transparent 55%, transparent 100%)'
+              }}
+              animate={{
+                backgroundPosition: ['200% 0', '-200% 0']
+              }}
+              transition={{
+                duration: 8,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop"
+              }}
+            >
+              Features for Your Health
+            </motion.span>
           </motion.h2>
           <motion.p
             className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto"
@@ -494,7 +402,7 @@ function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
-            Experience the future of mental health technology with cutting-edge AI, 
+            Experience the future of mental health technology with cutting-edge AI,
             beautiful visualizations, and compassionate support systems.
           </motion.p>
         </motion.div>
@@ -513,7 +421,7 @@ function HomePage() {
             >
               {/* Background Gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-              
+
               {/* Icon Container */}
               <motion.div
                 className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mb-6 relative z-10`}
@@ -622,7 +530,7 @@ function HomePage() {
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
-            Join over 50,000 users who have discovered a smarter, more compassionate 
+            Join over 50,000 users who have discovered a smarter, more compassionate
             approach to emotional well-being with our AI-powered platform.
           </motion.p>
 
@@ -634,7 +542,7 @@ function HomePage() {
           >
             <motion.button
               className="group bg-white text-blue-600 px-10 py-5 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center space-x-3 relative overflow-hidden"
-              whileHover={{ 
+              whileHover={{
                 scale: 1.05,
                 boxShadow: "0 25px 50px -12px rgba(255, 255, 255, 0.5)"
               }}
@@ -747,7 +655,7 @@ function HomePage() {
                   <p className="text-sm text-slate-600 dark:text-slate-400">{testimonial.role}</p>
                 </div>
               </div>
-              
+
               <div className="flex mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <motion.span
@@ -761,7 +669,7 @@ function HomePage() {
                   </motion.span>
                 ))}
               </div>
-              
+
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed italic">
                 "{testimonial.content}"
               </p>
@@ -791,7 +699,7 @@ function HomePage() {
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
               Get the latest insights on mental health, new features, and wellness tips
             </p>
-            
+
             <motion.div
               className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
               initial={{ y: 20, opacity: 0 }}
@@ -816,7 +724,7 @@ function HomePage() {
         </div>
       </motion.div>
 
-      
+
     </div>
   )
 }

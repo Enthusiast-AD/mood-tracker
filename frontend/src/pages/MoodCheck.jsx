@@ -424,7 +424,7 @@ function MoodCheck() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Enhanced Celebration Animation */}
+      /* Enhanced Celebration Animation */
       <AnimatePresence>
         {showCelebration && (
           <motion.div
@@ -434,7 +434,7 @@ function MoodCheck() {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-3xl p-8 text-center max-w-md mx-4 shadow-2xl"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-8 text-center max-w-md mx-4 shadow-2xl border border-gray-200 dark:border-gray-700"
               initial={{ scale: 0.5, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.5, opacity: 0, y: 50 }}
@@ -775,7 +775,7 @@ function MoodCheck() {
                     transition={{ duration: 0.3 }}
                   >
                     <span className={`text-2xl font-bold ${moodDescriptions[moodEntry.score].color}`}>
-                      {moodEntry.score}/11 - {moodDescriptions[moodEntry.score].text}
+                      {moodEntry.score}/10 - {moodDescriptions[moodEntry.score].text}
                     </span>
                   </motion.div>
                   
@@ -1166,7 +1166,7 @@ function MoodCheck() {
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="font-semibold text-green-700 dark:text-green-300">Mood Score:</span>
-                        <span className="ml-2">{moodEntry.score}/11 ({moodDescriptions[moodEntry.score].text})</span>
+                        <span className="ml-2">{moodEntry.score}/10 ({moodDescriptions[moodEntry.score].text})</span>
                       </div>
                       <div>
                         <span className="font-semibold text-green-700 dark:text-green-300">Emotions:</span>
