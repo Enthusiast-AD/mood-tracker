@@ -10,7 +10,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt'
 import ServiceWorkerUpdate from './components/ServiceWorkerUpdate'
 import PageTransition from './components/animations/PageTransition'
 import EnhancedToaster from './components/ui/EnhancedToast'
-import Footer from '../src/components/layout/Footer'
+import Footer from '../src/components/Footer/Footer'
 // import FloatingActionButton from './components/ui/FloatingActionButton'
 import SmartNotificationScheduler from './services/SmartNotificationScheduler'
 

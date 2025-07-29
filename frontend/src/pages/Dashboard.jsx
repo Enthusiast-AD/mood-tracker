@@ -15,7 +15,6 @@ import {
   Shield,
   Activity
 } from 'lucide-react'
-import Footer from '../components/layout/Footer'
 
 const Dashboard = () => {
   const { user, isAuthenticated } = useAuth()
